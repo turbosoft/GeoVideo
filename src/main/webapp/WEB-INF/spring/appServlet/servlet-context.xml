@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- Enables the Spring MVC @Controller programming model -->
+	<mvc:annotation-driven />
+
+	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/jsp/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	
+	<context:component-scan base-package="kr.co.turbosoft" />
+	
+	<!-- Annotation 을 사용하지 않는 경우에 대한 MVC 처리 설정 -->
+    <mvc:view-controller path="/geoVideo/video_viewer.do" view-name="sub/viewer/video_viewer"/>
+    <mvc:view-controller path="/geoVideo/video_write.do" view-name="sub/write/video_write"/>
+    <mvc:view-controller path="/geoVideo/video_write_page.do" view-name="video_write_page"/>
+    <mvc:view-controller path="/geoVideo/xml_view.do" view-name="sub/write/xml_view"/>
+    <mvc:view-controller path="/geoVideo/video_googlemap.do" view-name="sub/maps/video_googlemap"/>
+</beans>
