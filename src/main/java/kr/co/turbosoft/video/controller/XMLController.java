@@ -22,9 +22,6 @@ public class XMLController {
 		
 		String file_dir = request.getSession().getServletContext().getRealPath("/")+"upload\\";
 		
-		System.out.println("xml_data : " + xml_data);
-		System.out.println("file_dir : " + file_dir);
-		
 		String result = "";
 		XMLRW xmlRW = new XMLRW();
 		result = xmlRW.write(file_dir, file_name, xml_data);
