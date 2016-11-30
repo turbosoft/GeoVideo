@@ -126,12 +126,8 @@ var gps_size;
 function loadGPS() {
 	var buf = file_url.split('.');
 	var xml_file_name = buf[0] + '.gpx';
-// 	for(var i=0; i<buf.length-1; i++) {
-// 		if(i==buf.length-2) file_name += buf[i] + '.gpx';
-// 		else file_name += buf[i] + '.';
-// 	}
-	
 	var lat_arr = new Array(); var lng_arr = new Array();
+	
 	$.ajax({
 		type: "GET",
 		url: base_url + upload_url + xml_file_name,
@@ -158,7 +154,6 @@ function loadGPS() {
 /* map_start ----------------------------------- 맵 버튼 설정 ------------------------------------- */
 function reloadMap(type) {
 	var arr = readMapData();
-// 	$('#googlemap').get(0).contentWindow.setCenter(arr[0], arr[1], 1);
 	if(type==2) { $('#googlemap').get(0).contentWindow.setAngle(arr[2], arr[3]); }
 }
 
@@ -207,16 +202,8 @@ function videoWrite() {
 	});
 }
 
-//뷰어에서 호출되는 다이얼로그 닫기 기능
-// function closeVideoViewer() {
-// 	//강제로 페이지 이동 시키며 뷰어 닫기
-// 	location.href = '/GeoVideo'; 
-// }
-
 // //새창 띄우기 (저작)
 function openVideoWrite() {
-// 	var conv_full_url = encodeURIComponent(full_url);
-	
 	window.open('', 'video_write_page', 'width=1145, height=926');
 	var form = document.createElement('form');
 	form.setAttribute('method','post');
@@ -264,7 +251,6 @@ function loadXML() {
 				if(max_top < parseInt(frameline)) max_top = parseInt(frameline);
 			});
 			var max_line = max_top / 25
-// 			for(var i=0; i<max_line; i++) { createFrameLine(2); }
 			$(xml).find('obj').each(function(index) {
 				var id = $(this).find('id').text();
 				var frame_obj;
@@ -285,11 +271,6 @@ function loadXML() {
 					
 					createIcon(src);
 					var obj = $('#'+auto_icon_str);
-// 					obj.parent().position().top = top;
-// 					obj.parent().position().left = left;
-// 					var leftX = left/590 * 780;
-// 					var topY = top/360 * 580;
-// 					obj.parent().attr('style', 'overflow: hidden; position: absolute; width:'+width+'; height:'+height+'; top:'+top+'px; left:'+left+'px; margin:0px;');
 					obj.attr('style', 'position:absolute; display: block; top:'+top+'px; left:'+left+'px; width:'+width+'; height:'+height+';');
 					frame_obj = $('#frame'+auto_icon_str);
 					
@@ -308,8 +289,6 @@ function loadXML() {
 					var y_str = $(this).find('ystr').text();
 					var line_color = $(this).find('linecolor').text();
 					var bg_color = $(this).find('backgroundcolor').text();
-// 					$('#geometry_line_color').val(line_color);
-// 					$('#geometry_bg_color').val(bg_color);
 					var buf1 = x_str.split('_');
 					for(var i=0; i<buf1.length; i++) { geometry_point_arr_1.push(parseInt(buf1[i])); }
 					var buf2 = y_str.split('_');
@@ -333,17 +312,12 @@ function loadXML() {
 //소스가 길어서 따로 함수로 생성
 function autoCreateText(id, font_size, font_color, bg_color, bold, italic, underline, href, text, top, left) {
 	if(id == "c") {
-// 		left = Math.floor(left*(760/570));
-// 		top = Math.floor(top*(500/340));
 		createCaption(id, font_size, font_color, bg_color, bold, italic, underline, href, text);
 		var obj = $('#'+auto_caption_str);
 		obj.attr('style', 'position:absolute; left:'+left+'px; top:'+top+'px; display:block;');
 	}
 	else if(id == "b") {
 		text = text.replace(/@line@/g, "\r\n");
-		
-// 		left = Math.floor(left*(760/570));
-// 		top = Math.floor(top*(500/340));
 		createBubble(id, font_size, font_color, bg_color, bold, italic, underline, href, text);
 		var obj = $('#'+auto_bubble_str);
 		obj.attr('style', 'position:absolute; left:'+left+'px; top:'+top+'px; display:block;');
@@ -374,7 +348,6 @@ function createCaption(id, font_size, font_color, bg_color, bold, italic, underl
 	var div_element = $(document.createElement('div'));
 	div_element.attr('id', auto_caption_str); div_element.attr('style', 'position:absolute; left:10px; top:10px; display:block;'); 
 	div_element.html(html_text); 
-// 	div_element.dblclick(function() { inputCaption(div_element.attr('id'), text); }); 
 	div_element.appendTo('#video_main_area');
 	
 	auto_caption_num++;
@@ -408,7 +381,6 @@ function createBubble(id, font_size, font_color, bg_color, bold, italic, underli
 	var div_element = $(document.createElement('div'));
 	div_element.attr('id', auto_bubble_str); div_element.attr('style', 'position:absolute; left:10px; top:10px; display:block;');
 	div_element.html(html_text);
-// 	div_element.dblclick(function() { inputBubble(div_element.attr('id'), text); });
 	div_element.appendTo('#video_main_area');
 
 	auto_bubble_num++;
@@ -431,14 +403,6 @@ function createIcon(img_src) {
 	img_element.attr('width', 100);
 	img_element.attr('height', 100);
 	img_element.appendTo('#video_main_area');
-// 	$('#'+img_element.attr('id')).resizable().parent().draggable();
-// 	$('#'+img_element.attr('id')).contextMenu('context2', {
-// 		bindings: {
-// 			'context_delete': function(t) {
-// 				jConfirm('정말 삭제하시겠습니까?', '정보', function(type){ if(type) $('#'+t.id).remove(); removeTableObject(t.id); });
-// 			}
-// 		}
-// 	});
 	
 	auto_icon_num++;
 	
@@ -475,10 +439,7 @@ function createGeometry(type, line_color, bg_color) {
 		max_y = Math.max.apply(Math, geometry_point_arr_2);
 	}
 	var left = min_x; var top = min_y; var width = max_x - min_x; var height = max_y - min_y;
-	//
-// 	left = left/590 * 780;
-// 	top = top/360 * 580;
-	//
+
 	var left_str = $('#video_player').css('left'); var top_str = $('#video_player').css('top');
 	var left_offset = parseInt(left_str.replace('px','')); var top_offset = parseInt(top_str.replace('px',''));
 	left += left_offset; top += top_offset;
@@ -544,10 +505,6 @@ function createGeometry(type, line_color, bg_color) {
 		context.stroke();
 	}
 	auto_geometry_num++;
-	
-// 	left = left/590 * 780;
-// 	top = top/360 * 580;
-// 	canvas.attr('style', 'position:absolute; display:block; left:'+left+'px; top:'+top+'px;');
 	
 	//데이터 저장
 	geometry_total_arr_1.push(x_str);
@@ -634,9 +591,6 @@ function inputFrameObj(type) {
 	else if(type=='geometry') { obj_str = 'frameg' + (auto_geometry_num-1); obj_text = 'Geometry'; }
 	else {}
 
-// 	var top = $('#video_obj_line').css('top');
-// 	top = top.replace('px','');
-// 	createFrameObj(obj_str, 0, parseInt(top), 100, obj_text);
 	createFrameObj(obj_str, 0, 0, 100, obj_text);
 }
 
@@ -712,8 +666,6 @@ css3color = function(color, opacity) {
 <textarea style='position:absolute; left:20px; top:540px; width:760px; height:35px; line-height: 20px;' readonly="readonly">
 <iframe width='760' height='500' src='http://turbosoft1.iptime.org:2125/GeoVideo/upload/a1_ogg.ogg' frameborder='0' allowfullscreen></iframe>
 </textarea>
-<%-- <input type="text" value="<iframe width='760' height='500' src='http://turbosoft1.iptime.org:2125/GeoVideo/upload/a1_ogg.ogg' frameborder='0' allowfullscreen></iframe>" --%>
-<!-- 	style='position:absolute; left:10px; top:530px; width:778px;'/> -->
 
 <div id="video_obj_area" style="display:none;"></div>
 
