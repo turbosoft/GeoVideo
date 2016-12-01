@@ -3,9 +3,15 @@ var base_url_buf = location.pathname.split('/');
 var base_url = 'http://' + location.host + '/' + base_url_buf[1] + '/';
 
 var imageUrl= base_url + 'images/geoImg/write/color.png';
+//var imageUrl='images/color.png';
 function iColorShow(id,id2){
 	var eICP=jQuery("#"+id2).position();
-	jQuery("#iColorPicker").css({'top':eICP.top+(jQuery("#"+id).outerHeight())+"px",'left':(eICP.left)+"px",'position':'absolute'}).fadeIn("fast");
+	var tmpId = id.split('_')[0];
+//	var iColTop = $('#'+ tmpId+ '_dialog').offset().top + eICP.top + $("#"+id).outerHeight();
+	var iColTop = $('#'+ tmpId+ '_dialog').offset().top;
+	var iColLeft = eICP.left + ($('#iColorPicker').width()/3*2) + 15;
+	
+	jQuery("#iColorPicker").css({'top':iColTop+"px",'left':iColLeft+"px",'position':'absolute'}).fadeIn("fast");
 	jQuery("#iColorPickerBg").css({'position':'fixed','top':0,'left':0,'width':'100%','height':'100%'}).fadeIn("fast");
 	var def=jQuery("#"+id).val();jQuery('#colorPreview span').text(def);jQuery('#colorPreview').css('background',def);
 	jQuery('#color').val(def);
