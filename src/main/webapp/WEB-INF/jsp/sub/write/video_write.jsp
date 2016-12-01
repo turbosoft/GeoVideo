@@ -72,6 +72,15 @@ $(function() {
 		});
 	}
 	
+	//저작 버튼 설정
+// 	$('.caption_button').button({ icons: { primary: 'ui-icon-grip-dotted-horizontal'} }); $('.caption_button').width(100); $('.caption_button').height(30); $('.caption_button').css('fontSize', 12); $('.caption_button').css('margin-top', 5); $('.caption_button').css('margin-left', 5); $('.caption_button').css('margin-bottom', 5);	
+// 	$('.speech_bubble_button').button({ icons: { primary: 'ui-icon-comment'} }); $('.speech_bubble_button').width(140); $('.speech_bubble_button').height(30); $('.speech_bubble_button').css('fontSize', 12);
+// 	$('.icon_button').button({ icons: { primary: 'ui-icon-heart'} }); $('.icon_button').width(100); $('.icon_button').height(30); $('.icon_button').css('fontSize', 12);	
+// 	$('.geometry_button').button({ icons: { primary: 'ui-icon-geometry'} }); $('.geometry_button').width(100); $('.geometry_button').height(30); $('.geometry_button').css('fontSize', 12);
+// 	$('.analysis_button').button({ icons: { primary: 'ui-icon-note'} }); $('.analysis_button').width(100); $('.analysis_button').height(30); $('.analysis_button').css('fontSize', 12);	
+// 	$('.save_button').button({ icons: { primary: 'ui-icon-disk'}, text: false }); $('.save_button').width(30); $('.save_button').height(30);
+// 	$('.exit_button').button({ icons: { primary: 'ui-icon-closethick'}, text: false }); $('.exit_button').width(30); $('.exit_button').height(30);
+
 	//프레임 라인 설정
 	$('.frame_plus').button({ icons: { primary: 'ui-icon-plusthick'}, text: false });
 	$('.frame_minus').button({ icons: { primary: 'ui-icon-minusthick'}, text: false });
@@ -309,6 +318,7 @@ function inputCaption(id, text) {
 	if(id==0 & text=="") {
 		//caption dialog 내부 객체 초기화
 		$('#caption_font_select').val('Normal'); $('#caption_font_color').val('#000000'); $('#caption_font_color').css('background-color', '#000000'); $('#caption_bg_color').val('#FFFFFF'); $('#caption_bg_color').css('background-color', '#FFFFFF'); $('input[name=caption_bg_checkbok]').attr('checked', true); $('#icp_caption_bg_color').removeAttr('onclick'); $('#caption_check').html('<input type="checkbox" id="caption_bold" style="display:none;"/><img src="<c:url value="/images/geoImg/write/bold_off.png"/>" '+icon_css+' onclick="captionCheck(this);"><input type="checkbox" id="caption_italic" style="display:none;" /><img src="<c:url value="/images/geoImg/write/italic_off.png"/>" '+icon_css+' onclick="captionCheck(this);"><input type="checkbox" id="caption_underline" style="display:none;" /><img src="<c:url value="/images/geoImg/write/underLine_off.png"/>" '+icon_css+' onclick="captionCheck(this);"><input type="checkbox" id="caption_link" style="display:none;"/><img src="<c:url value="/images/geoImg/write/hyperLink_off.png"/>" '+icon_css+' onclick="captionCheck(this);">'); $('#caption_button').html('<button class="ui-state-default ui-corner-all" style="width:80px; height:30px; font-size:12px;" onclick="createCaption();">입력</button>'); $('#caption_text').val('');
+// 		$('#caption_font_select').val('Normal'); $('#caption_font_color').val('#000000'); $('#caption_font_color').css('background-color', '#000000'); $('#caption_bg_color').val('#FFFFFF'); $('#caption_bg_color').css('background-color', '#FFFFFF'); $('input[name=caption_bg_checkbok]').attr('checked', true); $('#icp_caption_bg_color').removeAttr('onclick'); $('#caption_check').html('<input type="checkbox" id="caption_bold" class="caption_bold" /><label for="caption_bold" style="width:30px; height:30px;">Bold</label><input type="checkbox" id="caption_italic" class="caption_italic" /><label for="caption_italic" style="width:30px; height:30px;">Italic</label><input type="checkbox" id="caption_underline" class="caption_underline" /><label for="caption_underline" style="width:30px; height:30px;">Underline</label><input type="checkbox" id="caption_link" class="caption_link" /><label for="caption_link" style="width:30px; height:30px;">HyperLink</label>'); $('.caption_bold').button({ icons: { primary: 'ui-icon-bold'}, text: false }); $('.caption_italic').button({ icons: { primary: 'ui-icon-italic'}, text: false }); $('.caption_underline').button({ icons: { primary: 'ui-icon-underline'}, text: false }); $('.caption_link').button({ icons: { primary: 'ui-icon-link'}, text: false }); $('#caption_button').html('<button class="ui-state-default ui-corner-all" style="width:80px; height:30px; font-size:12px;" onclick="createCaption();">입력</button>'); $('#caption_text').val('');
 	}
 	else {
 		//caption dialog 내부 객체 설정
@@ -364,6 +374,16 @@ function inputCaption(id, text) {
 			img_kind = 'on';
 		}
 		check_html += ' /><img src="<c:url value="/images/geoImg/write/hyperLink_'+img_kind+'.png"/>" '+icon_css+' onclick="captionCheck(this);">';
+		
+// 		if(html_text.indexOf('<b id') != -1) check_html += '<input type="checkbox" id="caption_bold" class="caption_bold" checked="checked" /><label for="caption_bold" style="width:30px; height:30px;">Bold</label>';
+// 		else check_html += '<input type="checkbox" id="caption_bold" class="caption_bold" /><label for="caption_bold" style="width:30px; height:30px;">Bold</label>';
+// 		if(html_text.indexOf('<i id') != -1) check_html += '<input type="checkbox" id="caption_italic" class="caption_italic" checked="checked" /><label for="caption_italic" style="width:30px; height:30px;">Italic</label>';
+// 		else check_html += '<input type="checkbox" id="caption_italic" class="caption_italic" /><label for="caption_italic" style="width:30px; height:30px;">Italic</label>';
+// 		if(html_text.indexOf('<u id') != -1) check_html += '<input type="checkbox" id="caption_underline" class="caption_underline" checked="checked" /><label for="caption_underline" style="width:30px; height:30px;">Underline</label>';
+// 		else check_html += '<input type="checkbox" id="caption_underline" class="caption_underline" /><label for="caption_underline" style="width:30px; height:30px;">Underline</label>';
+// 		if(html_text.indexOf('<a href') != -1) check_html += '<input type="checkbox" id="caption_link" class="caption_link" checked="checked" /><label for="caption_link" style="width:30px; height:30px;">HyperLink</label>';
+// 		else check_html += '<input type="checkbox" id="caption_link" class="caption_link" /><label for="caption_link" style="width:30px; height:30px;">HyperLink</label>';
+// 		$('#caption_check').html(check_html); $('.caption_bold').button({ icons: { primary: 'ui-icon-bold'}, text: false }); $('.caption_italic').button({ icons: { primary: 'ui-icon-italic'}, text: false }); $('.caption_underline').button({ icons: { primary: 'ui-icon-underline'}, text: false }); $('.caption_link').button({ icons: { primary: 'ui-icon-link'}, text: false }); $('#caption_text').val($('#p'+id).html()); $('#caption_button').html('<button id="caption_replace_btn" class="ui-state-default ui-corner-all" style="width:80px; height:30px; font-size:12px;">수정</button>');
 		
 		$('#caption_check').html(check_html); 
 		$('#caption_text').val($('#p'+id).html()); 
@@ -468,6 +488,7 @@ function inputBubble(id, text) {
 	if(id==0 & text=="") {
 		//bubble dialog 내부 객체 초기화
 		$('#bubble_font_select').val('Normal'); $('#bubble_font_color').val('#000000'); $('#bubble_font_color').css('background-color', '#000000'); $('#bubble_bg_color').val('#FFFFFF'); $('#bubble_bg_color').css('background-color', '#FFFFFF'); $('input[name=bubble_bg_checkbok]').attr('checked', true); $('#icp_bubble_bg_color').removeAttr('onclick'); $('#bubble_check').html('<input type="checkbox" id="bubble_bold" style="display:none;"/><img src="<c:url value="/images/geoImg/write/bold_off.png"/>" '+icon_css+' onclick="captionCheck(this);"><input type="checkbox" id="bubble_italic" style="display:none;" /><img src="<c:url value="/images/geoImg/write/italic_off.png"/>" '+icon_css+' onclick="captionCheck(this);"><input type="checkbox" id="bubble_underline" style="display:none;" /><img src="<c:url value="/images/geoImg/write/underLine_off.png"/>" '+icon_css+' onclick="captionCheck(this);"><input type="checkbox" id="bubble_link" style="display:none;"/><img src="<c:url value="/images/geoImg/write/hyperLink_off.png"/>" '+icon_css+' onclick="captionCheck(this);">'); $('#bubble_button').html('<button class="ui-state-default ui-corner-all" style="width:80px; height:30px; font-size:12px;" onclick="createBubble();">입력</button>'); $('#bubble_text').val('');
+// 		$('#bubble_font_select').val('Normal'); $('#bubble_font_color').val('#000000'); $('#bubble_font_color').css('background-color', '#000000'); $('#bubble_bg_color').val('#FFFFFF'); $('#bubble_bg_color').css('background-color', '#FFFFFF'); $('input[name=bubble_bg_checkbok]').attr('checked', true); $('#icp_bubble_bg_color').removeAttr('onclick'); $('#bubble_check').html('<input type="checkbox" id="bubble_bold" class="bubble_bold" /><label for="bubble_bold" style="width:30px; height:30px;">Bold</label><input type="checkbox" id="bubble_italic" class="bubble_italic" /><label for="bubble_italic" style="width:30px; height:30px;">Italic</label><input type="checkbox" id="bubble_underline" class="bubble_underline" /><label for="bubble_underline" style="width:30px; height:30px;">Underline</label><input type="checkbox" id="bubble_link" class="bubble_link" /><label for="bubble_link" style="width:30px; height:30px;">HyperLink</label>'); $('.bubble_bold').button({ icons: { primary: 'ui-icon-bold'}, text: false }); $('.bubble_italic').button({ icons: { primary: 'ui-icon-italic'}, text: false }); $('.bubble_underline').button({ icons: { primary: 'ui-icon-underline'}, text: false }); $('.bubble_link').button({ icons: { primary: 'ui-icon-link'}, text: false }); $('#bubble_button').html('<button class="ui-state-default ui-corner-all" style="width:80px; height:30px; font-size:12px;" onclick="createBubble();">입력</button>'); $('#bubble_text').val('');
 	}
 	else {
 		//caption dialog 내부 객체 설정
@@ -515,6 +536,16 @@ function inputBubble(id, text) {
 			img_kind = 'on';
 		}
 		check_html += ' /><img src="<c:url value="/images/geoImg/write/hyperLink_'+img_kind+'.png"/>" '+icon_css+' onclick="captionCheck(this);">';
+		
+// 		if(html_text.indexOf('<b id') != -1) check_html += '<input type="checkbox" id="bubble_bold" class="bubble_bold" checked="checked" /><label for="bubble_bold" style="width:30px; height:30px;">Bold</label>';
+// 		else check_html += '<input type="checkbox" id="bubble_bold" class="bubble_bold" /><label for="bubble_bold" style="width:30px; height:30px;">Bold</label>';
+// 		if(html_text.indexOf('<i id') != -1) check_html += '<input type="checkbox" id="bubble_italic" class="bubble_italic" checked="checked" /><label for="bubble_italic" style="width:30px; height:30px;">Italic</label>';
+// 		else check_html += '<input type="checkbox" id="bubble_italic" class="bubble_italic" /><label for="bubble_italic" style="width:30px; height:30px;">Italic</label>';
+// 		if(html_text.indexOf('<u id') != -1) check_html += '<input type="checkbox" id="bubble_underline" class="bubble_underline" checked="checked" /><label for="bubble_underline" style="width:30px; height:30px;">Underline</label>';
+// 		else check_html += '<input type="checkbox" id="bubble_underline" class="bubble_underline" /><label for="bubble_underline" style="width:30px; height:30px;">Underline</label>';
+// 		if(html_text.indexOf('<a href') != -1) check_html += '<input type="checkbox" id="bubble_link" class="bubble_link" checked="checked" /><label for="bubble_link" style="width:30px; height:30px;">HyperLink</label>';
+// 		else check_html += '<input type="checkbox" id="bubble_link" class="bubble_link" /><label for="bubble_link" style="width:30px; height:30px;">HyperLink</label>';
+// 		$('#bubble_check').html(check_html); $('.bubble_bold').button({ icons: { primary: 'ui-icon-bold'}, text: false }); $('.bubble_italic').button({ icons: { primary: 'ui-icon-italic'}, text: false }); $('.bubble_underline').button({ icons: { primary: 'ui-icon-underline'}, text: false }); $('.bubble_link').button({ icons: { primary: 'ui-icon-link'}, text: false }); $('#bubble_text').val($('#p'+id).html()); $('#bubble_button').html('<button id="bubble_replace_btn" class="ui-state-default ui-corner-all" style="width:80px; height:30px; font-size:12px;">수정</button>');
 		
 		$('#bubble_check').html(check_html);
 		$('#bubble_text').val($('#p'+id).html()); 
@@ -1270,6 +1301,14 @@ var img_kind = 'off';
 			check_html += ' /><img src="<c:url value="/images/geoImg/write/link_'+img_kind+'.png"/>" '+icon_css+' onclick="captionCheck(this);">';
 		}
 		
+// 		if(bold == 'true') check_html += '<input type="checkbox" id="caption_bold" class="caption_bold" checked="checked" /><label for="caption_bold" style="width:30px; height:30px;">Bold</label>';
+// 		else check_html += '<input type="checkbox" id="caption_bold" class="caption_bold" /><label for="caption_bold" style="width:30px; height:30px;">Bold</label>';
+// 		if(italic == 'true') check_html += '<input type="checkbox" id="caption_italic" class="caption_italic" checked="checked" /><label for="caption_italic" style="width:30px; height:30px;">Italic</label>';
+// 		else check_html += '<input type="checkbox" id="caption_italic" class="caption_italic" /><label for="caption_italic" style="width:30px; height:30px;">Italic</label>';
+// 		if(underline == 'true') check_html += '<input type="checkbox" id="caption_underline" class="caption_underline" checked="checked" /><label for="caption_underline" style="width:30px; height:30px;">Underline</label>';
+// 		else check_html += '<input type="checkbox" id="caption_underline" class="caption_underline" /><label for="caption_underline" style="width:30px; height:30px;">Underline</label>';
+// 		if(href == 'true') check_html += '<input type="checkbox" id="caption_link" class="caption_link" checked="checked" /><label for="caption_link" style="width:30px; height:30px;">HyperLink</label>';
+// 		else check_html += '<input type="checkbox" id="caption_link" class="caption_link" /><label for="caption_link" style="width:30px; height:30px;">HyperLink</label>';
 		$('#caption_check').html(check_html);
 		$('#caption_text').val(text);
 		
@@ -1323,6 +1362,14 @@ var img_kind = 'off';
 			check_html += ' /><img src="<c:url value="/images/geoImg/write/link_'+img_kind+'.png"/>" '+icon_css+' onclick="captionCheck(this);">';
 		}
 		
+// 		if(bold == 'true') check_html += '<input type="checkbox" id="bubble_bold" class="bubble_bold" checked="checked" /><label for="bubble_bold" style="width:30px; height:30px;">Bold</label>';
+// 		else check_html += '<input type="checkbox" id="bubble_bold" class="bubble_bold" /><label for="bubble_bold" style="width:30px; height:30px;">Bold</label>';
+// 		if(italic == 'true') check_html += '<input type="checkbox" id="bubble_italic" class="bubble_italic" checked="checked" /><label for="bubble_italic" style="width:30px; height:30px;">Italic</label>';
+// 		else check_html += '<input type="checkbox" id="bubble_italic" class="bubble_italic" /><label for="bubble_italic" style="width:30px; height:30px;">Italic</label>';
+// 		if(underline == 'true') check_html += '<input type="checkbox" id="bubble_underline" class="bubble_underline" checked="checked" /><label for="bubble_underline" style="width:30px; height:30px;">Underline</label>';
+// 		else check_html += '<input type="checkbox" id="bubble_underline" class="bubble_underline" /><label for="bubble_underline" style="width:30px; height:30px;">Underline</label>';
+// 		if(href == 'true') check_html += '<input type="checkbox" id="bubble_link" class="bubble_link" checked="checked" /><label for="bubble_link" style="width:30px; height:30px;">HyperLink</label>';
+// 		else check_html += '<input type="checkbox" id="bubble_link" class="bubble_link" /><label for="bubble_link" style="width:30px; height:30px;">HyperLink</label>';
 		$('#bubble_check').html(check_html);
 		text = text.replace(/@line@/g, "\r\n");
 		$('#bubble_text').val(text);
@@ -1430,6 +1477,8 @@ var resize_scale = 400;
 var init_map_left, init_map_top, init_map_width, init_map_height;
 function resizeMap() {
 	if(resize_map_state==1) {
+// 		init_map_left = 610;
+// 		init_map_top = 575;
 		init_map_left = 801;
 		init_map_top = 580;
 		init_map_width = $('#video_map_area').width();
@@ -1500,9 +1549,29 @@ function closeVideoWrite(){
 	<div style="width: 18%; float: left;" class="menuIcon"><img src="<c:url value='/images/geoImg/write/image_btn.png'/>" onclick='inputIcon();' style="cursor: pointer; width: 150px; height: 40px; margin-top: 10px; margin-left:3%;"></div>
 	<div style="width: 18%; float: left;" class="menuIcon"><img src="<c:url value='/images/geoImg/write/geo_btn.png'/>" onclick='inputGeometry();' style="cursor: pointer; width: 150px; height: 40px; margin-top: 10px; margin-left:3%;"></div>
 	<div style="width: 18%; float: left; display: none;" class="menuIcon menuIconData"><img src="<c:url value='/images/geoImg/write/data_btn.png'/>" onclick='dataChangeClick();' style="cursor: pointer; width: 30px; height: 40px; margin-top: 10px; margin-left:25%;"></div>
-	<input type="button" onclick='closeImageWrite();' class='close_btn' value="닫기">
+	<input type="button" onclick='closeVideoWrite();' class='close_btn' value="닫기">
 	<input type="button" onclick='saveSetting();' class='save_btn' value="저장">
 </div>
+
+<!-- <div class='video_write_function' style='position:absolute; left:10px; top:10px; width:910px; display:block; background-color:#16193c;'> -->
+<%-- 	<div style="width: 18%; float: left;" class="menuIcon"><img src="<c:url value='/images/geoImg/write/caption_btn.png'/>" onclick='inputCaption(0,"");' style="cursor: pointer; width: 140px; height: 40px; margin-top: 10px; margin-left:3%;"></div> --%>
+<%-- 	<div style="width: 18%; float: left;" class="menuIcon"><img src="<c:url value='/images/geoImg/write/speech_btn.png'/>" onclick='inputBubble(0,"");' style="cursor: pointer; width: 140px; height: 40px; margin-top: 10px; margin-left:3%;"></div> --%>
+<%-- 	<div style="width: 18%; float: left;" class="menuIcon"><img src="<c:url value='/images/geoImg/write/image_btn.png'/>" onclick='inputIcon();' style="cursor: pointer; width: 140px; height: 40px; margin-top: 10px; margin-left:3%;"></div> --%>
+<%-- 	<div style="width: 18%; float: left;" class="menuIcon"><img src="<c:url value='/images/geoImg/write/geo_btn.png'/>" onclick='inputGeometry();' style="cursor: pointer; width: 140px; height: 40px; margin-top: 10px; margin-left:3%;"></div> --%>
+<%-- 	<div style="width: 18%; float: left; display: none;" class="menuIcon menuIconData"><img src="<c:url value='/images/geoImg/write/geo_btn.png'/>" onclick='dataChangeClick();' style="cursor: pointer; width: 140px; height: 40px; margin-top: 10px; margin-left:3%;"></div> --%>
+<!-- 	<input type="button" onclick='closeImageWrite();' class='close_btn' value="닫기"> -->
+<!-- 	<input type="button" onclick='saveSetting();' class='save_btn' value="저장"> -->
+<!-- 	<table> -->
+<!-- 		<tr><td><button class='caption_button' onclick='inputCaption(0,"");'>Caption</button></td> -->
+<!-- 		<td><button class='speech_bubble_button' onclick='inputBubble(0,"");'>Speech Bubble</button></td> -->
+<!-- 		<td><button class='icon_button' onclick='inputIcon();'>Image</button></td> -->
+<!-- 		<td><button class='geometry_button' onclick='inputGeometry();'>Geometry</button></td> -->
+<!-- <!-- 		<td><button class='analysis_button' onclick=''>Analysis</button></td> -->
+<!-- 		<!-- <td width=700><button class='map_button' onclick='reloadMap(2);'>Map</button></td> -->
+<!-- 		<td width=700></td> -->
+<!-- 		<td><button class='save_button' onclick='saveSetting();'>Save</button></td> -->
+<!-- 		<td><button class='exit_button' onclick='closeVideoWrite();'>EXIT</button></td></tr> -->
+<!-- 	</table> -->
 
 <!-- 탭 , 공유 우저 영역 -->
 <div id="showInfoDiv" style="position:absolute; left:805px; top:13px; color:white;display: none;">
@@ -1512,6 +1581,8 @@ function closeVideoWrite(){
 
 <!-- 저작 영역 -->
 <div id='video_main_area' style='position:absolute; left:10px; top:70px; width:780px; height:510px; display:block; border:1px solid #999999;'>
+<!-- <div id='video_main_area' style='position:absolute; left:10px; top:70px; width:590px; height:360px; display:block; border:1px solid #999999;'> -->
+<!-- 	<video id='video_player' width='570' height='340' controls='true' style='position:absolute; left:10px; top:10px;'> -->
 	<video id='video_player' width='760' height='500' controls='true' style='position:absolute; left:10px; top:10px;'>
 		<source id='video_src' src='' type='video/ogg'></source>
 		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다.
