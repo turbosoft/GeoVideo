@@ -19,12 +19,14 @@ String idx = request.getParameter("idx");
 String user_id = request.getParameter("user_id");
 String file_url = request.getParameter("file_url");
 String b_contentTabArr = request.getParameter("b_contentTabArr");	//contentTab array
+String projectUserId = request.getParameter("projectUserId");	//project User id
 %>
 
 <script type="text/javascript">
 var loginId = '<%= loginId %>';				// 로그인 아이디
 var loginType = '<%= loginType %>';			// 로그인 타입
 var loginToken = '<%= loginToken %>';		// 로그인 token
+var projectUserId = '<%= projectUserId %>';		//project User id
 
 var idx = '<%= idx %>';
 var user_id = '<%= user_id %>';
@@ -35,6 +37,7 @@ var projectBoard = 0;	//GeoCMS 연동여부		0:연동안됨, 1:연동됨
 var file_url = '<%= file_url %>';
 var base_url = '';
 var upload_url = '';
+var editUserYN  = 0;						//편집가능여부
 
 $(function() {
 	$('.video_write_button').button();
@@ -53,6 +56,7 @@ $(function() {
 	$("#video_player").bind("timeupdate", function() {
 		timeUpdate(parseInt(this.currentTime), parseInt(this.duration));
 	});
+	$('#iframeSrc').text("<iframe width='760' height='500' src='http://turbosoft1.iptime.org:2125/GeoVideo/geoVideo/video_viewer.do?file_url="+ file_url+ "' frameborder='0' allowfullscreen></iframe>");
 });
 
 //GeoCMS 연결여부 확인 function
@@ -90,12 +94,17 @@ function httpRequest(textUrl){
 		if(request.readyState == 4 && request.status == 200){
 			projectBoard = 1;
 		}
+		
 		if(request.readyState == 4){
 			if(projectBoard == 1){
 				base_url = 'http://'+ location.host + '/GeoCMS';
 				upload_url = '/upload/GeoVideo/';
 				if(loginId != null && loginId != '' && ((loginId == user_id && loginType != 'WRITE') || loginType == 'ADMIN' || (user_id == null || user_id == '' || user_id == 'null'))){
 					$('.video_write_button').parent().css('display', 'block');
+				}else{
+					if(editUserCheck() == 1 ||  projectUserId == loginId){
+						$('.video_write_button').parent().css('display', 'block');
+					}
 				}
 			}else{
 				base_url = '<c:url value="/"/>';
@@ -104,6 +113,29 @@ function httpRequest(textUrl){
 			}
 		}
 	}
+}
+
+//편집 가능 유저 확인
+function editUserCheck(){
+	var Url			= baseRoot() + "cms/getShareUser/";
+	var param		= loginToken + "/" + loginId + "/" + idx + "/GeoVideo";
+	var callBack	= "?callback=?";
+	editUserYN  = 0;
+	
+	$.ajax({
+		  type	: "get"
+		, url	: Url + param + callBack
+		, dataType	: "jsonp"
+		, async	: false
+		, cache	: false
+		, success: function(response) {
+			if(response.Code == 100 && response.Data[0].SHAREEDIT == 'Y'){
+				editUserYN = 1;
+			}
+		}
+	});
+	
+	return editUserYN;
 }
 
 function videoViewerInit() {
@@ -216,11 +248,14 @@ function videoWrite() {
 // //새창 띄우기 (저작)
 function openVideoWrite() {
 // 	var conv_full_url = encodeURIComponent(full_url);
+	if(editUserYN == 0 && (projectUserId == loginId && projectUserId != user_id)){
+		editUserYN = 1;
+	}
 	
 	window.open('', 'video_write_page', 'width=1145, height=926');
 	var form = document.createElement('form');
 	form.setAttribute('method','post');
-	form.setAttribute('action',"<c:url value='/geoVideo/video_write_page.do'/>?loginToken="+loginToken+"&loginId="+loginId+"&projectBoard="+projectBoard);
+	form.setAttribute('action',"<c:url value='/geoVideo/video_write_page.do'/>?loginToken="+loginToken+"&loginId="+loginId+"&projectBoard="+projectBoard+'&editUserYN='+editUserYN+'&projectUserId='+projectUserId);
 	form.setAttribute('target','video_write_page');
 	document.body.appendChild(form);
 	
@@ -257,7 +292,7 @@ function loadXML() {
 		dataType: "xml",
 		cache: false,
 		success: function(xml) {
-			jAlert('객체 정보를 로드 합니다.', '정보');
+// 			jAlert('객체 정보를 로드 합니다.', '정보');
 			var max_top = 0;
 			$(xml).find('obj').each(function(index) {
 				var frameline = $(this).find('frameline').text();
@@ -693,6 +728,14 @@ css3color = function(color, opacity) {
 	return 'rgba('+hex_to_decimal(color.substr(0,2))+','+hex_to_decimal(color.substr(2,2))+','+hex_to_decimal(color.substr(4,2))+','+opacity+')';
 };
 
+//소스보기
+function iframeSrcView(){
+	if($('#iframeSrc').css('display') == 'none'){
+		$('#iframeSrc').css('display','block');
+	}else{
+		$('#iframeSrc').css('display','none');
+	}
+}
 </script>
 
 </head>
@@ -710,10 +753,13 @@ css3color = function(color, opacity) {
 </div>
 
 <!-- <textarea style='position:absolute; left:20px; top:540px; width:760px; height:35px; line-height: 20px;' readonly="readonly"> -->
-<!-- <iframe width='760' height='500' src='http://turbosoft1.iptime.org:2125/GeoVideo/upload/a1_ogg.ogg' frameborder='0' allowfullscreen></iframe> -->
+<!-- <iframe width='760' height='500' src='http://turbosoft1.iptime.org:2125/GeoVideo/geoVideo/video_viewer.do?file_url=sampleVideo_ogg.ogg' frameborder='0' allowfullscreen></iframe> -->
 <!-- </textarea> -->
-<%-- <input type="text" value="<iframe width='760' height='500' src='http://turbosoft1.iptime.org:2125/GeoVideo/upload/a1_ogg.ogg' frameborder='0' allowfullscreen></iframe>" --%>
-<!-- 	style='position:absolute; left:10px; top:530px; width:778px;'/> -->
+<!-- <input type="text" id="iframeSrc" value="" style='position:absolute; left:10px; top:530px; width:778px;'/> -->
+
+<button  onclick='iframeSrcView();' style='position:absolute; left:20px; top:545px;'>Source Code</button>
+<textarea id="iframeSrc" style='position:absolute; left:120px; top:545px; width:660px; height:35px; line-height: 17px; font-size:12px; display:none;' readonly="readonly">
+</textarea>
 
 <div id="video_obj_area" style="display:none;"></div>
 
