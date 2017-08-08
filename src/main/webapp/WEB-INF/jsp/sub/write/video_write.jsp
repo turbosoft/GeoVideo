@@ -14,6 +14,7 @@ String loginToken = request.getParameter("loginToken");
 String loginId = request.getParameter("loginId");
 String b_contentTabArr = request.getParameter("b_contentTabArr");	//contentTab array
 String projectBoard = request.getParameter("projectBoard");
+String editUserYN = request.getParameter("editUserYN");
 %>
 <script type="text/javascript">
 
@@ -26,6 +27,7 @@ if(b_contentTabArr != null){
 	b_contentTabArr = b_contentTabArr.split(",");
 }
 var projectBoard = '<%= projectBoard %>';
+var editUserYN = '<%= editUserYN %>';
 
 var nowSelTab;
 var nowShareType;
@@ -43,14 +45,16 @@ $(function() {
 	},function(){
 		$('.menuIcon').css('border','none');
 	});
+	
 	if(projectBoard == 1){
 		base_url = 'http://'+ location.host + '/GeoCMS';
 		upload_url = '/upload/GeoVideo/';
-		
-		//ui 
-		$('#showInfoDiv').css('display','block');
-		$('.menuIcon').css('width','14%');
-		$('.menuIconData').css('display', 'block');
+		if(editUserYN != 1){
+			//ui 
+			$('#showInfoDiv').css('display','block');
+			$('.menuIcon').css('width','14%');
+			$('.menuIconData').css('display', 'block');
+		}
 		
 		//tab select
 		innerHTML = '';
@@ -58,7 +62,6 @@ $(function() {
 			innerHTML += '<option value="'+ b_contentTabArr[i] +'">'+ b_contentTabArr[i] +'</option>';
 		}
 		$('#showKind').append(innerHTML);
-		
 		getOneVideoData();
 	}else{
 		base_url = '<c:url value="/"/>';
@@ -1073,6 +1076,8 @@ function saveVideoWrite(type) {
 						var tmpAddShareUser = $('#shareAdd').val();
 						var tmpRemoveShareUser = $('#shareRemove').val();
 						var tmpTabName = $('#showKind').val();
+						var tmpEditYes = $('#editYes').val();
+						var tmpEditNo = $('#editNo').val();
 										
 						tmpTitle = tmpTitle.replace(/\//g,'&sbsp');
 						tmpContent = tmpContent.replace(/\//g,'&sbsp');
@@ -1092,16 +1097,13 @@ function saveVideoWrite(type) {
 							 return;
 						 }
 						 
-						 if(tmpAddShareUser == null || tmpAddShareUser.length <= 0){
-							 tmpAddShareUser = '&nbsp';
-						 }
-						 
-						 if(tmpRemoveShareUser == null || tmpRemoveShareUser.length <= 0){
-							 tmpRemoveShareUser = '&nbsp';
-						 }
+						 if(tmpAddShareUser == null || tmpAddShareUser.length <= 0){ tmpAddShareUser = '&nbsp'; }
+						 if(tmpRemoveShareUser == null || tmpRemoveShareUser.length <= 0){ tmpRemoveShareUser = '&nbsp'; }
+						 if(tmpEditYes == null || tmpEditYes == ''){ tmpEditYes = '&nbsp'; }
+						 if(tmpEditNo == null || tmpEditNo == ''){ tmpEditNo = '&nbsp'; }
 						
 						var Url			= baseRoot() + "cms/updateVideo/";
-						var param		= loginToken + "/" + loginId + "/" + idx + "/" + tmpTitle + "/" + tmpContent + "/" + tmpTabName + "/" + tmpShareType + "/" + tmpAddShareUser + "/" + tmpRemoveShareUser + "/" + tmp_xml_text;
+						var param		= loginToken + "/" + loginId + "/" + idx + "/" + tmpTitle + "/" + tmpContent + "/" + tmpTabName + "/" + tmpShareType + "/" + tmpAddShareUser + "/" + tmpRemoveShareUser + "/" + tmp_xml_text +"/" + tmpEditYes + "/" + tmpEditNo;
 						var callBack	= "?callback=?";
 						
 						$.ajax({
@@ -1390,7 +1392,7 @@ function loadXML() {
 		dataType: "xml",
 		cache: false,
 		success: function(xml) {
-			jAlert('객체 정보를 로드 합니다.', '정보');
+// 			jAlert('객체 정보를 로드 합니다.', '정보');
 			var max_top = 0;
 			$(xml).find('obj').each(function(index) {
 				var frameline = $(this).find('frameline').text();
@@ -1779,6 +1781,8 @@ function closeVideoWrite(){
 
 <input type="hidden" id="shareAdd"/>
 <input type="hidden" id="shareRemove"/>
+<input type="hidden" id="editYes"/>
+<input type="hidden" id="editNo"/>
 <div id="clonSharUser" style="display:none;"></div>
 
 <!-- 오른클릭 Context Menu -->
