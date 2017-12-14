@@ -1629,7 +1629,7 @@ function closeVideoWrite(){
 </div>
 
 <!-- 추가 객체 영역 -->
-<div id="ioa_title" style="position:absolute; left:800px; top:345px; width:330px; height:50px;"><img src="<c:url value='/images/geoImg/title_02.jpg'/>" alt="객체추가리스트"></div>
+<div id="ioa_title" style="position:absolute; left:800px; top:345px; width:330px; height:50px;"><img src="<c:url value='/images/geoImg/title_02.jpg'/>" alt="Object added list"></div>
 <div id='video_object_area' style='position:absolute; left:800px; top:365px; width:330px; height:210px; display:block; border:1px solid #999999; overflow-y:scroll;'>
 	<table id='object_table'>
 		<tr style='font-size:12px; height:20px;' class='col_black'>
