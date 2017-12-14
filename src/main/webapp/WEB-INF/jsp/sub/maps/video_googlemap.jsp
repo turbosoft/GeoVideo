@@ -75,7 +75,10 @@ function setGPSData(lat_arr, lng_arr) {
 			if(i==0) setCenter(lat_arr[i], lng_arr[i]);
 		}
 	}
-	else { jAlert('GPS 파일의 Latitude 와 Longitude 가 맞지 않습니다.', '정보'); }
+	else {
+// 		jAlert('GPS 파일의 Latitude 와 Longitude 가 맞지 않습니다.', '정보');
+		jAlert('Latitude and Longitude of the GPS file do not match.', 'Info');
+	}
 	setDirection(poly_arr);
 }
 </script>
