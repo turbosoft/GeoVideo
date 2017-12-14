@@ -51,7 +51,7 @@ textarea
 
 /* video_write.jsp */
 .save_btn {background-color: #066ab0;color: #fff;cursor: pointer;float: right;margin: 17px 5px;height: 30px;border: 1px solid #000000;}
-.close_btn {background-color: #444444;color: #fff;cursor: pointer;float: right;margin: 17px 15px;height: 30px;border: 1px solid #000000;}
+.close_btn {background-color: #444444;color: #fff;cursor: pointer;float: right;margin: 17px 5px;height: 30px;border: 1px solid #000000;}
 
 .anno_head_tr {height: 20px; text-align: center; color: #fff;}
 #upload_table div {float:left; margin-top: 5px;}
