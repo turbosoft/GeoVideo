@@ -748,7 +748,8 @@ function iframeSrcView(){
 <div id='video_main_area' style='position:absolute; left:10px; top:15px; width:780px; height:580px; display:block; border:1px solid #999999;'>
 	<video id='video_player' width='760' height='500' controls='true' style='position:absolute; left:10px; top:10px;'>
 		<source id='video_src' src='' type='video/ogg'></source>
-		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다.
+			Supported in HTML5 capable browser (Firefox 3.6 or Chrome).
+<!-- 		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다. -->
 	</video>
 </div>
 
@@ -764,7 +765,7 @@ function iframeSrcView(){
 <div id="video_obj_area" style="display:none;"></div>
 
 <!-- 추가 객체 영역 -->
-<div id="ioa_title" style='position:absolute; left:797px; top:12px; width:330px; height:245px;'><img src="<c:url value='/images/geoImg/title_02.jpg'/>" alt="객체추가리스트"></div>
+<div id="ioa_title" style='position:absolute; left:797px; top:12px; width:330px; height:245px;'><img src="<c:url value='/images/geoImg/title_02.jpg'/>" alt="Object added list"></div>
 <div id='video_object_area' style='position:absolute; left:800px; top:33px; width:300px; height:230px; display:block; border:1px solid #999999; overflow-y:scroll;'>
 	<table id='object_table'>
 		<tr style='font-size:12px; height:20px;' class='col_black'>
