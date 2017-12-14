@@ -1105,6 +1105,8 @@ function saveVideoWrite(type) {
 							 jAlert('No sharing user specified.', 'Info');
 							 return;
 						 }
+						 tmpTitle = encodeURIComponent(tmpTitle);
+						 tmpContent = encodeURIComponent(tmpContent);
 						 
 						 if(tmpAddShareUser == null || tmpAddShareUser.length <= 0){ tmpAddShareUser = '&nbsp'; }
 						 if(tmpRemoveShareUser == null || tmpRemoveShareUser.length <= 0){ tmpRemoveShareUser = '&nbsp'; }
