@@ -230,7 +230,8 @@ function resizeMap() {
 
 //저작
 function videoWrite() {
-	jConfirm('뷰어를 닫고 저작을 수행하시겠습니까?', '정보', function(type){
+// 	jConfirm('뷰어를 닫고 저작을 수행하시겠습니까?', '정보', function(type){
+	jConfirm('Do you want to close the viewer and author?', 'Info', function(type){
 		if(type) {
 			//뷰어 닫기 수행
 			jQuery.FrameDialog.closeDialog();	//뷰어 닫기
@@ -292,7 +293,6 @@ function loadXML() {
 		dataType: "xml",
 		cache: false,
 		success: function(xml) {
-// 			jAlert('객체 정보를 로드 합니다.', '정보');
 			var max_top = 0;
 			$(xml).find('obj').each(function(index) {
 				var frameline = $(this).find('frameline').text();
