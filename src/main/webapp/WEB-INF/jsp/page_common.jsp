@@ -40,6 +40,11 @@ var videoBaseUrl = function(){
 	return br;
 };
 
+var videoOutUrl = function(){ 
+	var br = "http://turbosoft1.iptime.org:2125";
+	return br;
+};
+
 var dataReplaceFun = function(oldData){
 	var replaceResultData = "";
 	if(oldData != null && oldData != undefined){

@@ -111,7 +111,7 @@ function httpRequest(textUrl){
 				upload_url = '/upload/';
 				$('body').append('<button class="video_write_button" style="position:absolute; left:380px; top:780px; width:140px; height:35px; display:block; cursor: pointer;" onclick="videoWrite();">Writer</button>');
 				$('.viewerCloseBtn').css('display','block');
-				$('#iframeSrc').text("<iframe width='760' height='500' src='http://turbosoft1.iptime.org:2125/GeoVideo/geoVideo/video_viewer.do?file_url="+ file_url+ "' frameborder='0' allowfullscreen></iframe>");
+				$('#iframeSrc').text("<iframe width='760' height='500' src='"+ videoOutUrl() +"/GeoVideo/geoVideo/video_viewer.do?file_url="+ file_url+ "' frameborder='0' allowfullscreen></iframe>");
 			}
 		}
 	}
@@ -194,7 +194,7 @@ function changeVideo() {
 							
 							if(k == 0){
 								file_url =  response[k].filename;
-								$('#iframeSrc').text("<iframe width='760' height='500' src='http://turbosoft1.iptime.org:2125/GeoVideo/geoVideo/video_viewer.do?file_url="+ file_url+ "&idx="+idx+"' frameborder='0' allowfullscreen></iframe>");
+								$('#iframeSrc').text("<iframe width='760' height='500' src='"+ videoOutUrl() +"/GeoVideo/geoVideo/video_viewer.do?file_url="+ file_url+ "&idx="+idx+"' frameborder='0' allowfullscreen></iframe>");
 								projectIdx = response[k].projectidx;
 							}
 						}
@@ -338,7 +338,7 @@ function addImageMoveList(){
 						innerHTMLStr += "<div ";
 						var tmpViewId = "MOVE_"+ data[i].datakind + "_" + data[i].idx;
 
-						if(idx == data[i].idx || (nowIndexType == '&empty' && idx == '&empty' && i == 0 )){
+						if((idx == data[i].idx && data[i].datakind == 'GeoVideo') || (nowIndexType == '&empty' && idx == '&empty' && i == 0 )){
 							innerHTMLStr += " style='border:2px solid #00b8b0;";
 						}else{
 							innerHTMLStr += " style='border:2px solid #888888;";
@@ -356,7 +356,7 @@ function addImageMoveList(){
 						
 						innerHTMLStr += "</a>";
 
-						if(idx == data[i].idx || (nowIndexType == '&empty' && idx == '&empty' && i == 0 )){
+						if((idx == data[i].idx && data[i].datakind == 'GeoVideo') || (nowIndexType == '&empty' && idx == '&empty' && i == 0 )){
 							if(nowIndexType == '&empty' && idx == '&empty' && i == 0 ){
 								imgMapCenterChange("'"+ tempArr + "'");
 							}
@@ -905,7 +905,6 @@ function loadGPS() {
 	var lat_arr = new Array();
 	var lng_arr = new Array();
 	
-	alert(videoBaseUrl() + upload_url + xml_file_name);
 	$.ajax({
 		type: "POST",
 		url: base_url + '/getGeoXml.do',
