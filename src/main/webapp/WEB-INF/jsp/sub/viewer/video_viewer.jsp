@@ -96,14 +96,7 @@ function httpRequest(textUrl){
 				base_url = 'http://'+ location.host + '/GeoCMS';
 				upload_url = '/GeoVideo/';
 				
-				if(loginId != null && loginId != '' && loginId != 'null' && ((loginId == user_id && loginType != 'WRITE') || loginType == 'ADMIN')){
-					$('body').append('<button class="video_write_button" style="position:absolute; left:380px; top:780px; width:140px; height:35px; display:block; cursor: pointer;" onclick="videoWrite();">Writer</button>');
-					$('.viewerCloseBtn').css('display','block');
-				}else if(editUserCheck() == 1 ||  (loginId != null && loginId != '' && loginId != 'null' && projectUserId == loginId)){
-					$('body').append('<button class="video_write_button" style="position:absolute; left:380px; top:780px; width:140px; height:35px; display:block; cursor: pointer;" onclick="videoWrite();">Writer</button>');
-					$('.viewerCloseBtn').css('display','block');
-				}
-				
+				btnViewCheck();
 			}else{
 				base_url = '<c:url value="/"/>';
 				upload_url = '/upload/';
@@ -112,6 +105,19 @@ function httpRequest(textUrl){
 				$('#iframeSrc').text("<iframe width='760' height='500' src='"+ videoOutUrl() +"/GeoVideo/geoVideo/video_viewer.do?file_url="+ file_url+ "' frameborder='0' allowfullscreen></iframe>");
 			}
 		}
+	}
+}
+
+function btnViewCheck(){
+	$('.video_write_button').remove();
+	$('.viewerCloseBtn').css('display','none');
+	
+	if(loginId != null && loginId != '' && loginId != 'null' && ((loginId == user_id && loginType != 'WRITE') || loginType == 'ADMIN')){
+		$('body').append('<button class="video_write_button" style="position:absolute; left:380px; top:780px; width:140px; height:35px; display:block; cursor: pointer;" onclick="videoWrite();">Writer</button>');
+		$('.viewerCloseBtn').css('display','block');
+	}else if(editUserCheck() == 1 ||  (loginId != null && loginId != '' && loginId != 'null' && projectUserId == loginId)){
+		$('body').append('<button class="video_write_button" style="position:absolute; left:380px; top:780px; width:140px; height:35px; display:block; cursor: pointer;" onclick="videoWrite();">Writer</button>');
+		$('.viewerCloseBtn').css('display','block');
 	}
 }
 
@@ -540,6 +546,7 @@ function imgMapCenterChange(tmpArr){
 		return;
 	}else{
 		idx = nowSelectIdx;
+		btnViewCheck();
 		videoViewerInit();
 		return;
 	}
