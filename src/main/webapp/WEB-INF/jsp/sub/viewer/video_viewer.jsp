@@ -159,6 +159,8 @@ function changeVideo() {
 	$('#video_player3').attr('src','');
 	$('#video_player4').attr('src','');
 	$('#video_main_area').find('div').remove();
+	$('#video_main_area').find('img').remove();
+	$('#video_main_area').find('canvas').remove();
 	
 	$("#object_table > tbody > tr").each( function(tIdx, tVal){
 		if(tIdx > 0){
