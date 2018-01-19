@@ -18,7 +18,6 @@ String loginToken = request.getParameter("loginToken");
 String idx = request.getParameter("idx");
 String user_id = request.getParameter("user_id");
 String file_url = request.getParameter("file_url");
-String b_contentTabArr = request.getParameter("b_contentTabArr");	//contentTab array
 String projectUserId = request.getParameter("projectUserId");	//project User id
 %>
 
@@ -30,7 +29,6 @@ var projectUserId = '<%= projectUserId %>';		//project User id
 
 var idx = '<%= idx %>';
 var user_id = '<%= user_id %>';
-var b_contentTabArr = "<%=b_contentTabArr%>";	//content tab array
 var request = null;		//request;
 var projectBoard = 0;	//GeoCMS 연동여부		0:연동안됨, 1:연동됨
 
@@ -1002,12 +1000,6 @@ function openVideoWrite() {
 	insertIdx.setAttribute('name','idx');
 	insertIdx.setAttribute('value',idx);
 	form.appendChild(insertIdx);
-	
-	var insertContentArr = document.createElement('input');
-	insertContentArr.setAttribute('type','hidden');
-	insertContentArr.setAttribute('name','b_contentTabArr');
-	insertContentArr.setAttribute('value',b_contentTabArr);
-	form.appendChild(insertContentArr);
 	
 	form.submit();
 }
