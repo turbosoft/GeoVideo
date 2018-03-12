@@ -14,6 +14,7 @@ String loginToken = request.getParameter("loginToken");
 String loginId = request.getParameter("loginId");
 String b_contentTabArr = request.getParameter("b_contentTabArr");
 String projectBoard = request.getParameter("projectBoard");
+String editUserYN = request.getParameter("editUserYN");
 %>
 <script type="text/javascript">
 
@@ -24,9 +25,10 @@ function init() {
 	var loginId = '<%=loginId%>';
 	var b_contentTabArr = '<%=b_contentTabArr%>';
 	var projectBoard = '<%=projectBoard%>';
+	var editUserYN = '<%=editUserYN%>';
 	
 	var video_write_frame = document.getElementById('video_write_frame');
-	video_write_frame.contentWindow.location.href = "<c:url value='/geoVideo/video_write.do'/>?file_url="+file_url+"&idx="+ idx+"&loginToken="+loginToken+"&loginId="+loginId+"&b_contentTabArr="+b_contentTabArr+'&projectBoard='+projectBoard;
+	video_write_frame.contentWindow.location.href = "<c:url value='/geoVideo/video_write.do'/>?file_url="+file_url+"&idx="+ idx+"&loginToken="+loginToken+"&loginId="+loginId+"&b_contentTabArr="+b_contentTabArr+'&projectBoard='+projectBoard+'&editUserYN='+editUserYN;
 }
 </script>
 
