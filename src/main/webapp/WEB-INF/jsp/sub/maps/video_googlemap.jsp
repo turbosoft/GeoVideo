@@ -26,7 +26,10 @@ function init() {
 
 //촬영 지점 설정
 function setCenter(lat, lng) {
-	if(lat_str != 0 && lng_str != 0) {
+	var lat = parseFloat(lat);
+	var lng = parseFloat(lng);
+	
+	if(lat != 0 && lng != 0) {
 		marker_latlng = new google.maps.LatLng(lat, lng); map.setZoom(16);
 	}else {
 		if(dMarkerLat == null || dMarkerLat == ""){
