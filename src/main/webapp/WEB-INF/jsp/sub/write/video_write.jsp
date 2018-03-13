@@ -1674,7 +1674,7 @@ function closeVideoWrite(){
 	<div style='display:table; width:100%; height:100%;'>
 		<div align="center" style='display:table-cell; vertical-align:middle;'>
 			<table border='0'>
-				<tr><td width=65><label style="font-size:12px;">Font Size : </label></td>
+				<tr><td><label style="font-size:12px;">Font Size : </label></td>
 				<td><select id="caption_font_select" style="font-size:12px;"><option>Normal<option>H3<option>H2<option>H1</select></td>
 				<td><label style="font-size:12px;">Font Color : </label></td>
 				<td><input id="caption_font_color" type="text" class="iColorPicker" value="#FFFFFF" style="width:50px;"/></td>
@@ -1695,7 +1695,7 @@ function closeVideoWrite(){
 	<div style='display:table; width:100%; height:100%;'>
 		<div align="center" style='display:table-cell; vertical-align:middle;'>
 			<table border='0'>
-				<tr><td width=65><label style="font-size:12px;">Font Size : </label></td>
+				<tr><td><label style="font-size:12px;">Font Size : </label></td>
 				<td><select id="bubble_font_select" style="font-size:12px;"><option>Normal<option>H3<option>H2<option>H1</select></td>
 				<td><label style="font-size:12px;">Font Color : </label></td>
 				<td><input id="bubble_font_color" type="text" class="iColorPicker" value="#FFFFFF" style="width:50px;"/></td>
