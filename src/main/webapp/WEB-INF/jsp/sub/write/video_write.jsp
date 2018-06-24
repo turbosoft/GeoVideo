@@ -39,6 +39,10 @@ var video2 = document.getElementById("video_player2");
 var video3 = document.getElementById("video_player3");
 var video4 = document.getElementById("video_player4");
 
+var dMarkerLat = 0;		//default marker latitude
+var dMarkerLng = 0;		//default marker longitude
+var dMapZoom = 10;		//default map zoom
+
 $(function() {
 	$('.menuIcon img').hover(function(){
 		$(this).parent().css('border-left','1px solid #6d808f');
@@ -58,6 +62,8 @@ $(function() {
 		}
 		
 		getOneVideoData();
+		getVideoBase();
+		getServer("");
 	}else{
 		base_url = '<c:url value="/"/>';
 		upload_url = '/upload/';
@@ -109,7 +115,8 @@ function getOneVideoData(){
 					
 					$('#title_area').val(response.title);
 					$('#content_area').val(response.content);
-					var nowShareTypeText = nowShareType == 0? '비공개':nowShareType== 1? '전체공개':'특정인 공개';
+// 					var nowShareTypeText = nowShareType == 0? '비공개':nowShareType== 1? '전체공개':'특정인 공개';
+					var nowShareTypeText = nowShareType == 0? 'Nondisclosure':nowShareType== 1? 'Full disclosure':'Selective disclosure';
 					
 					$('#shareKindLabel').text(nowShareTypeText);
 					
@@ -120,7 +127,85 @@ function getOneVideoData(){
 					}
 				}
 			}else{
-				jAlert(data.Message, '정보');
+				jAlert(data.Message, 'Info');
+			}
+		}
+	});
+}
+
+//초기 설정 데이터 불러오기
+function getVideoBase() {
+	
+	var Url			= baseRoot() + "cms/getbase";
+	var callBack	= "?callback=?";
+	
+	$.ajax({
+		type	: "get"
+		, url	: Url + callBack
+		, dataType	: "jsonp"
+		, async	: false
+		, cache	: false
+		, success: function(data) {
+			if(data.Code == '100'){
+				var result = data.Data;
+				if(result != null && result.length > 0){
+					dMarkerLat = result[0].latitude;
+					dMarkerLng = result[0].longitude;
+					dMapZoom = result[0].mapzoom;
+					$('#googlemap').get(0).contentWindow.setDefaultData(dMarkerLat, dMarkerLng, dMapZoom);
+				}
+			}else{
+				jAlert(data.Message, 'Info');
+			}
+		}
+	});
+}
+
+//get server
+function getServer(tmpFileType){
+	var Url			= baseRoot() + "cms/selectServerList/";
+	var param		= loginToken + "/" + loginId +"/" +"Y";
+	var callBack	= "?callback=?";
+	$.ajax({
+		type	: "get"
+		, url	: Url + param + callBack
+		, dataType	: "jsonp"
+		, async	: false
+		, cache	: false
+		, success: function(data) {
+			var response = data.Data;
+			var tmpServerId = '';
+			var tmpServerPass = '';
+			var tmpServerPort = '';
+			
+			if(data.Code == '100'){
+				b_serverUrl = response[0].serverurl;
+				b_serverViewPort = response[0].serverviewport;
+				b_serverPath = response[0].serverpath;
+				if(b_serverUrl != null && b_serverUrl != "" && b_serverUrl != undefined){
+					b_serverType = "URL";
+				}else{
+					b_serverType = "LOCAL";
+				}
+				tmpServerId = response[0].serverid;
+				tmpServerPass = response[0].serverpass;
+				tmpServerPort = response[0].serverport;
+				
+			}else if(data.Code != '200'){
+				b_serverPath = "upload";
+				jAlert(data.Message, 'Info');
+			}else{
+				b_serverPath = "upload";
+			}
+			
+			if(tmpFileType != null){
+				if(tmpFileType == 'XML'){
+					loadXML2(tmpServerId, tmpServerPass, tmpServerPort);
+				}else if(tmpFileType == 'GPS'){
+					loadGPS2(tmpServerId, tmpServerPass, tmpServerPort);
+				}else if(tmpFileType == "1" || tmpFileType == "2"){
+					saveVideoWrite(tmpFileType, tmpServerId, tmpServerPass, tmpServerPort);
+				}
 			}
 		}
 	});
@@ -187,21 +272,24 @@ function changeVideo() {
 						}
 						
 						//좌표
-						var gpsData = data.GpsData;
-						loadGPSForData(gpsData);
+						var gpsDataStr = response[0].gpsdata;
+						if(gpsDataStr != null){
+							gpsDataStr = gpsDataStr.gpsData
+							loadGPSForData(gpsDataStr);
+						}
 						
 						if(video_child_len < 4){
-							var tmpHtmlStr = "<div style='width:380px; height:230px;'>동영상 없음</div>";
+							var tmpHtmlStr = "<div style='width:380px; height:230px;'>No video</div>";
 							$('#video_player4').css('background','url("../images/geoImg/novideo.png")');
 							$('#video_player4').css('board','none');
 						}
 						if(video_child_len < 3){
-							var tmpHtmlStr = "<div style='width:380px; height:230px;'>동영상 없음</div>";
+							var tmpHtmlStr = "<div style='width:380px; height:230px;'>No video</div>";
 							$('#video_player3').css('background','url("../images/geoImg/novideo.png")');
 							$('#video_player3').css('board','none');
 						}
 						if(video_child_len < 2){
-							var tmpHtmlStr = "<div style='width:380px; height:230px;'>동영상 없음</div>";
+							var tmpHtmlStr = "<div style='width:380px; height:230px;'>No video</div>";
 							$('#video_player2').css('background','url("../images/geoImg/novideo.png")');
 							$('#video_player2').css('board','none');
 						}
@@ -216,7 +304,7 @@ function changeVideo() {
 						},500);	
 					}
 				}else{
-					jAlert(data.Message, '정보');
+					jAlert(data.Message, 'Info');
 				}
 			}
 		});
@@ -229,16 +317,23 @@ function changeVideo() {
 /* map_start ----------------------------------- 맵 설정 ------------------------------------- */
 var gps_size;
 function loadGPS() {
+	getServer('GPS');
+}
+
+function loadGPS2(tmpServerId, tmpServerPass, tmpServerPort) {
 	var buf = file_url.split('.');
 	var xml_file_name = buf[0] + '_modify.gpx';
+	xml_file_name = upload_url + xml_file_name;
+	xml_file_name = xml_file_name.substring(1);
 	
 	lat_arr = new Array();
 	lng_arr = new Array();
 	
 	$.ajax({
 		type: "POST",
-		url: base_url + '/getGeoXml.do',
-		data: 'file_name='+ videoBaseUrl() + upload_url + xml_file_name,
+		url: base_url + '/geoXml.do',
+		data: 'file_name='+xml_file_name+'&type=load&serverType='+b_serverType+'&serverUrl='+b_serverUrl+
+		'&serverPath='+b_serverPath+'&serverPort='+tmpServerPort+'&serverViewPort='+ b_serverViewPort +'&serverId='+tmpServerId+'&serverPass='+tmpServerPass,
 		success: function(xml) {
 			$(xml).find('trkpt').each(function(index) {
 				var lat_str = $(this).attr('lat');
@@ -317,7 +412,8 @@ function removeFrameLine() {
 		$('#video_obj_line').css({top: parseInt(top)-25});
 	}
 	else {
-		jAlert('프레임 라인을 더이상 제거할수 없습니다.', '정보');
+// 		jAlert('프레임 라인을 더이상 제거할수 없습니다.', '정보');
+		jAlert('The frame line can no longer be removed.', 'Info');
 	}
 }
 function inputFrameObj(type) {
@@ -367,6 +463,7 @@ function visibleFrameObj(point) {
 		}
 	}
 }
+
 function moveMap(time, totaltime) {
 // 	var ratio = time * gps_size / totaltime;
 	if(gps_size > 0){
@@ -385,7 +482,7 @@ function inputCaption(id, text) {
 	
 	if(id==0 & text=="") {
 		//caption dialog 내부 객체 초기화
-		$('#caption_font_select').val('Normal'); $('#caption_font_color').val('#000000'); $('#caption_font_color').css('background-color', '#000000'); $('#caption_bg_color').val('#FFFFFF'); $('#caption_bg_color').css('background-color', '#FFFFFF'); $('input[name=caption_bg_checkbok]').attr('checked', true); $('#icp_caption_bg_color').removeAttr('onclick'); $('#caption_check').html('<input type="checkbox" id="caption_bold" style="display:none;"/><img src="<c:url value="/images/geoImg/write/bold_off.png"/>" '+icon_css+' onclick="captionCheck(this);"><input type="checkbox" id="caption_italic" style="display:none;" /><img src="<c:url value="/images/geoImg/write/italic_off.png"/>" '+icon_css+' onclick="captionCheck(this);"><input type="checkbox" id="caption_underline" style="display:none;" /><img src="<c:url value="/images/geoImg/write/underLine_off.png"/>" '+icon_css+' onclick="captionCheck(this);"><input type="checkbox" id="caption_link" style="display:none;"/><img src="<c:url value="/images/geoImg/write/hyperLink_off.png"/>" '+icon_css+' onclick="captionCheck(this);">'); $('#caption_button').html('<button class="ui-state-default ui-corner-all" style="width:80px; height:30px; font-size:12px;" onclick="createCaption();">입력</button>'); $('#caption_text').val('');
+		$('#caption_font_select').val('Normal'); $('#caption_font_color').val('#000000'); $('#caption_font_color').css('background-color', '#000000'); $('#caption_bg_color').val('#FFFFFF'); $('#caption_bg_color').css('background-color', '#FFFFFF'); $('input[name=caption_bg_checkbok]').attr('checked', true); $('#icp_caption_bg_color').removeAttr('onclick'); $('#caption_check').html('<input type="checkbox" id="caption_bold" style="display:none;"/><img src="<c:url value="/images/geoImg/write/bold_off.png"/>" '+icon_css+' onclick="captionCheck(this);"><input type="checkbox" id="caption_italic" style="display:none;" /><img src="<c:url value="/images/geoImg/write/italic_off.png"/>" '+icon_css+' onclick="captionCheck(this);"><input type="checkbox" id="caption_underline" style="display:none;" /><img src="<c:url value="/images/geoImg/write/underLine_off.png"/>" '+icon_css+' onclick="captionCheck(this);"><input type="checkbox" id="caption_link" style="display:none;"/><img src="<c:url value="/images/geoImg/write/hyperLink_off.png"/>" '+icon_css+' onclick="captionCheck(this);">'); $('#caption_button').html('<button class="ui-state-default ui-corner-all" style="width:80px; height:30px; font-size:12px;" onclick="createCaption();">input</button>'); $('#caption_text').val('');
 	}
 	else {
 		//caption dialog 내부 객체 설정
@@ -444,7 +541,7 @@ function inputCaption(id, text) {
 		
 		$('#caption_check').html(check_html); 
 		$('#caption_text').val($('#p'+id).html()); 
-		$('#caption_button').html('<button id="caption_replace_btn" class="ui-state-default ui-corner-all" style="width:80px; height:30px; font-size:12px;">수정</button>');
+		$('#caption_button').html('<button id="caption_replace_btn" class="ui-state-default ui-corner-all" style="width:80px; height:30px; font-size:12px;">Modified</button>');
 		$('#caption_replace_btn').click(function() { replaceCaption(id); });
 	}
 	
@@ -484,7 +581,8 @@ function createCaption() {
 	$('#'+div_element.attr('id')).contextMenu('context1', {
 		bindings: {
 			'context_modify': function(t) { inputCaption(t.id, text); },
-			'context_delete': function(t) { jConfirm('정말 삭제하시겠습니까?', '정보', function(type){ if(type) { $('#'+t.id).remove(); removeTableObject(t.id); $('#frame'+t.id).remove(); } }); }
+// 			'context_delete': function(t) { jConfirm('정말 삭제하시겠습니까?', '정보', function(type){ if(type) { $('#'+t.id).remove(); removeTableObject(t.id); $('#frame'+t.id).remove(); } }); }
+			'context_delete': function(t) { jConfirm('Are you sure you want to delete?', 'Info', function(type){ if(type) { $('#'+t.id).remove(); removeTableObject(t.id); $('#frame'+t.id).remove(); } }); }
 		}
 	});
 	auto_caption_num++;
@@ -544,7 +642,7 @@ function inputBubble(id, text) {
 	
 	if(id==0 & text=="") {
 		//bubble dialog 내부 객체 초기화
-		$('#bubble_font_select').val('Normal'); $('#bubble_font_color').val('#000000'); $('#bubble_font_color').css('background-color', '#000000'); $('#bubble_bg_color').val('#FFFFFF'); $('#bubble_bg_color').css('background-color', '#FFFFFF'); $('input[name=bubble_bg_checkbok]').attr('checked', true); $('#icp_bubble_bg_color').removeAttr('onclick'); $('#bubble_check').html('<input type="checkbox" id="bubble_bold" style="display:none;"/><img src="<c:url value="/images/geoImg/write/bold_off.png"/>" '+icon_css+' onclick="captionCheck(this);"><input type="checkbox" id="bubble_italic" style="display:none;" /><img src="<c:url value="/images/geoImg/write/italic_off.png"/>" '+icon_css+' onclick="captionCheck(this);"><input type="checkbox" id="bubble_underline" style="display:none;" /><img src="<c:url value="/images/geoImg/write/underLine_off.png"/>" '+icon_css+' onclick="captionCheck(this);"><input type="checkbox" id="bubble_link" style="display:none;"/><img src="<c:url value="/images/geoImg/write/hyperLink_off.png"/>" '+icon_css+' onclick="captionCheck(this);">'); $('#bubble_button').html('<button class="ui-state-default ui-corner-all" style="width:80px; height:30px; font-size:12px;" onclick="createBubble();">입력</button>'); $('#bubble_text').val('');
+		$('#bubble_font_select').val('Normal'); $('#bubble_font_color').val('#000000'); $('#bubble_font_color').css('background-color', '#000000'); $('#bubble_bg_color').val('#FFFFFF'); $('#bubble_bg_color').css('background-color', '#FFFFFF'); $('input[name=bubble_bg_checkbok]').attr('checked', true); $('#icp_bubble_bg_color').removeAttr('onclick'); $('#bubble_check').html('<input type="checkbox" id="bubble_bold" style="display:none;"/><img src="<c:url value="/images/geoImg/write/bold_off.png"/>" '+icon_css+' onclick="captionCheck(this);"><input type="checkbox" id="bubble_italic" style="display:none;" /><img src="<c:url value="/images/geoImg/write/italic_off.png"/>" '+icon_css+' onclick="captionCheck(this);"><input type="checkbox" id="bubble_underline" style="display:none;" /><img src="<c:url value="/images/geoImg/write/underLine_off.png"/>" '+icon_css+' onclick="captionCheck(this);"><input type="checkbox" id="bubble_link" style="display:none;"/><img src="<c:url value="/images/geoImg/write/hyperLink_off.png"/>" '+icon_css+' onclick="captionCheck(this);">'); $('#bubble_button').html('<button class="ui-state-default ui-corner-all" style="width:80px; height:30px; font-size:12px;" onclick="createBubble();">input</button>'); $('#bubble_text').val('');
 	}
 	else {
 		//caption dialog 내부 객체 설정
@@ -595,7 +693,7 @@ function inputBubble(id, text) {
 		
 		$('#bubble_check').html(check_html);
 		$('#bubble_text').val($('#p'+id).html()); 
-		$('#bubble_button').html('<button id="bubble_replace_btn" class="ui-state-default ui-corner-all" style="width:80px; height:30px; font-size:12px;">수정</button>');
+		$('#bubble_button').html('<button id="bubble_replace_btn" class="ui-state-default ui-corner-all" style="width:80px; height:30px; font-size:12px;">Modified</button>');
 		$('#bubble_replace_btn').click(function() { replaceBubble(id); });
 	}
 	
@@ -633,7 +731,8 @@ function createBubble() {
 	$('#'+div_element.attr('id')).contextMenu('context1', {
 		bindings: {
 			'context_modify': function(t) { inputBubble(t.id, text); },
-			'context_delete': function(t) { jConfirm('정말 삭제하시겠습니까?', '정보', function(type){ 	if(type) { $('#'+t.id).remove(); removeTableObject(t.id); $('#frame'+t.id).remove(); } }); }
+// 			'context_delete': function(t) { jConfirm('정말 삭제하시겠습니까?', '정보', function(type){ 	if(type) { $('#'+t.id).remove(); removeTableObject(t.id); $('#frame'+t.id).remove(); } }); }
+			'context_delete': function(t) { jConfirm('Are you sure you want to delete?', 'Info', function(type){ 	if(type) { $('#'+t.id).remove(); removeTableObject(t.id); $('#frame'+t.id).remove(); } }); }
 		}
 	});
 	
@@ -750,7 +849,8 @@ function createIcon(img_src) {
 	$('#'+img_element.attr('id')).contextMenu('context2', {
 		bindings: {
 			'context_delete': function(t) {
-				jConfirm('정말 삭제하시겠습니까?', '정보', function(type){ if(type) $('#'+t.id).remove(); removeTableObject(t.id); $('#frame'+t.id).remove(); });
+// 				jConfirm('정말 삭제하시겠습니까?', '정보', function(type){ if(type) $('#'+t.id).remove(); removeTableObject(t.id); $('#frame'+t.id).remove(); });
+				jConfirm('Are you sure you want to delete?', 'Info', function(type){ if(type) $('#'+t.id).remove(); removeTableObject(t.id); $('#frame'+t.id).remove(); });
 			}
 		}
 	});
@@ -936,7 +1036,8 @@ function createGeometry(type) {
 	canvas_element.appendTo('#video_main_area');
 	$('#'+canvas_element.attr('id')).contextMenu('context2', {
 		bindings: {
-			'context_delete': function(t) { jConfirm('정말 삭제하시겠습니까?', '정보', function(type){ if(type) $('#'+t.id).remove(); removeTableObject(t.id); $('#frame'+t.id).remove(); }); }
+// 			'context_delete': function(t) { jConfirm('정말 삭제하시겠습니까?', '정보', function(type){ if(type) $('#'+t.id).remove(); removeTableObject(t.id); $('#frame'+t.id).remove(); }); }
+			'context_delete': function(t) { jConfirm('Are you sure you want to delete?', 'Info', function(type){ if(type) $('#'+t.id).remove(); removeTableObject(t.id); $('#frame'+t.id).remove(); }); }
 		}
 	});
 	//canvas 객체에 Geometry 그리기
@@ -1058,8 +1159,18 @@ function cancelGeometry() {
 function saveSetting() {
 	$('#save_dialog').dialog('open');
 }
+
 //저장 실행
-function saveVideoWrite(type) {
+function saveVideoWrite1(type) {
+	if(type == "1" || type == "2"){
+		getServer(type);
+	}else{
+		saveVideoWrite(type, "", "", "");
+	}
+}
+
+//저장 실행
+function saveVideoWrite(type, tmpServerId, tmpServerPass, tmpServerPort) {
 	$('#save_dialog').dialog('close');
 	
 	var obj_data_arr = new Array();
@@ -1106,7 +1217,10 @@ function saveVideoWrite(type) {
 	var xml_text = makeXMLStr(obj_data_arr);
 	var encode_xml_text = encodeURIComponent(xml_text);
 
-	var encode_file_name = encodeURIComponent(upload_url+file_url);
+	var encode_file_name = upload_url + file_url;
+	encode_file_name = encode_file_name.substring(1, encode_file_name.lastIndexOf(".")+1) +"xml" ;
+	encode_file_name = encodeURIComponent(encode_file_name);
+	
 	if(type==1 || type==2) {
 		var tmpTitle = $('#title_area').val();
 		var tmpContent = document.getElementById('content_area').value;
@@ -1117,35 +1231,41 @@ function saveVideoWrite(type) {
 		var tmpEditNo = $('#editNo').val();
 		
 		if(tmpTitle == null || tmpTitle == "" || tmpTitle == 'null'){
-			 jAlert('제목을 입력해 주세요.', '정보');
+// 			 jAlert('제목을 입력해 주세요.', '정보');
+			 jAlert('Please enter the title.', 'Info');
 			 return;
 		 }
 		 
 		 if(tmpContent == null || tmpContent == "" || tmpContent == 'null'){
-			 jAlert('내용을 입력해 주세요.', '정보');
+// 			 jAlert('내용을 입력해 주세요.', '정보');
+			 jAlert('Please enter your details.', 'Info');
 			 return;
 		 }
 		 
 		 if(tmpShareType != null && tmpShareType == 2 && (tmpAddShareUser == null || tmpAddShareUser == '') && oldShareUserLen == 0){
-			 jAlert('공유 유저가 지정되지 않았습니다.', '정보');
+// 			 jAlert('공유 유저가 지정되지 않았습니다.', '정보');
+			 jAlert('No sharing user specified.', 'Info');
 			 return;
 		 }
 		 
 		 if(tmpTitle != null && tmpTitle.indexOf('\'') > -1){
-			 jAlert('제목에 특수문자 \' 는 사용할 수 없습니다.', '정보');
+// 			 jAlert('제목에 특수문자 \' 는 사용할 수 없습니다.', '정보');
+			 jAlert('Can not use special character \' in title.', 'Info');
 			 return;
 		 }
 		 
 		 if(tmpContent != null && tmpContent.indexOf('\'') > -1){
-			 jAlert('내용에 특수문자 \' 는 사용할 수 없습니다.', '정보');
+// 			 jAlert('내용에 특수문자 \' 는 사용할 수 없습니다.', '정보');
+			 jAlert('Can not use special character \' in content.', 'Info');
 			 return;
 		 }
-		
+
 		//xml 저장
 		$.ajax({
 			type: 'POST',
 			url: base_url + '/geoXml.do',
-			data: 'file_name='+encode_file_name+'&xml_data='+encode_xml_text,
+			data: 'file_name='+encode_file_name+'&xml_data='+ encode_xml_text+'&type=save&serverType='+b_serverType+'&serverUrl='+b_serverUrl+
+			'&serverPath='+b_serverPath+'&serverPort='+tmpServerPort+'&serverViewPort='+ b_serverViewPort +'&serverId='+tmpServerId+'&serverPass='+tmpServerPass,
 			success: function(data) {
 				var response = data.trim();
 				if(response == 'XML_SAVE_SUCCESS'){
@@ -1177,9 +1297,10 @@ function saveVideoWrite(type) {
 								var response = data.Data;
 								if(data.Code == '100'){
 					 				$('#shareKindLabel').text();
-					 				jAlert('정상적으로 저장 되었습니다.', '정보');
+// 					 				jAlert('정상적으로 저장 되었습니다.', '정보');
+					 				jAlert('Saved successfully.', 'Info');
 								}else{
-									jAlert(data.Message, '정보');
+									jAlert(data.Message, 'Info');
 								}
 							}
 						});
@@ -1328,7 +1449,7 @@ function autoCreateText(id, font_size, font_color, bg_color, bold, italic, under
 		else { bg_color = '#FFFFFF'; $('input[name=caption_bg_checkbok]').attr('checked', true); }
 		
 		var check_html = "";
-var img_kind = 'off';
+		var img_kind = 'off';
 		
 		check_html += '<input type="checkbox" id="caption_bold" style="display:none;"';
 		if(bold == 'true'){
@@ -1428,13 +1549,20 @@ var img_kind = 'off';
 }
 
 function loadXML() {
+	getServer('XML');
+}
+
+function loadXML2(tmpServerId, tmpServerPass, tmpServerPort) {
 	var file_arr = file_url.split(".");   		
-	var xml_file_name = file_arr[0] + '.xml'; 
+	var xml_file_name = file_arr[0] + '.xml';
+	xml_file_name = upload_url + xml_file_name;
+	xml_file_name = xml_file_name.substring(1);
 	
 	$.ajax({
 		type: "POST",
-		url: base_url + '/getGeoXml.do',
-		data: 'file_name='+ videoBaseUrl() + upload_url + xml_file_name,
+		url: base_url + '/geoXml.do',
+		data: 'file_name='+xml_file_name+'&type=load&serverType='+b_serverType+'&serverUrl='+b_serverUrl+
+		'&serverPath='+b_serverPath+'&serverPort='+tmpServerPort+'&serverViewPort='+ b_serverViewPort +'&serverId='+tmpServerId+'&serverPass='+tmpServerPass,
 		success: function(xml) {
 			var max_top = 0;
 			$(xml).find('obj').each(function(index) {
@@ -1575,7 +1703,8 @@ css3color = function(color, opacity) {
 
 /* exit_start ----------------------------------- 종료 버튼 설정 ------------------------------------- */
 function closeVideoWrite(){
-	jConfirm('저작을 종료하시겠습니까?', '정보', function(type){
+// 	jConfirm('저작을 종료하시겠습니까?', '정보', function(type){
+	jConfirm('Do you want to end authoring?', 'Info', function(type){
 		if(type) { top.window.opener = top; top.window.open('','_parent',''); top.window.close(); }
 	});
 }
@@ -1742,33 +1871,37 @@ function vidplay() {
 	<div style="width: 18%; float: left;" class="menuIcon"><img src="<c:url value='/images/geoImg/write/image_btn.png'/>" onclick='inputIcon();' style="cursor: pointer; width: 150px; height: 40px; margin-top: 10px; margin-left:3%;"></div>
 	<div style="width: 18%; float: left;" class="menuIcon"><img src="<c:url value='/images/geoImg/write/geo_btn.png'/>" onclick='inputGeometry();' style="cursor: pointer; width: 150px; height: 40px; margin-top: 10px; margin-left:3%;"></div>
 	<div style="width: 18%; float: left; display: none;" class="menuIcon menuIconData"><img src="<c:url value='/images/geoImg/write/data_btn.png'/>" onclick='dataChangeClick();' style="cursor: pointer; width: 30px; height: 40px; margin-top: 10px; margin-left:25%;"></div>
-	<input type="button" onclick='closeVideoWrite();' class='close_btn' value="닫기">
-	<input type="button" onclick='saveSetting();' class='save_btn' value="저장">
+	<input type="button" onclick='closeVideoWrite();' class='close_btn' value="Close">
+	<input type="button" onclick='saveSetting();' class='save_btn' value="Save">
 </div>
 
 <!-- 탭 , 공유 우저 영역 -->
 <div id="showInfoDiv" style="position:absolute; left:805px; top:13px; color:white;display: none;">
 <!-- 	<div> TabName : <label id="showKindLabel"></label></div> -->
-	<div style="margin-top: 5px;"> 공유 설정 : <label id="shareKindLabel"></label></div>
+	<div style="margin-top: 5px;"> Sharing settings : <label id="shareKindLabel"></label></div>
 </div>
 
 <!-- 저작 영역 -->
 <div id='video_main_area' style='position:absolute; left:10px; top:70px; width:780px; height:510px; display:block; border:1px solid #999999;'>
 	<video id='video_player1' width='380' height='230' style='position:absolute; left:10px; top:10px; border: 1px solid gray;' preload="metadata">
-		<source id='video_src' src='' type='video/ogg'></source>
-		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다.
+		<source id='video_src' src='' type='video/mp4'></source>
+<!-- 		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다. -->
+		Supported in HTML5-enabled browsers (Firefox 3.6 or later or Chrome).
 	</video>
 	<video id='video_player2' width='380' height='230' style='position:absolute; left:390px; top:10px; border: 1px solid gray;' preload="metadata" >
-		<source type="video/ogg" />
-		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다.
+		<source type="video/mp4" />
+<!-- 		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다. -->
+		Supported in HTML5-enabled browsers (Firefox 3.6 or later or Chrome).
 	</video>
 	<video id='video_player3' width='380' height='230' style='position:absolute; left:10px; top:240px; border: 1px solid gray;' preload="metadata" >
-		<source type="video/ogg" />
-		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다.
+		<source type="video/mp4" />
+<!-- 		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다. -->
+		Supported in HTML5-enabled browsers (Firefox 3.6 or later or Chrome).
 	</video>
 	<video id='video_player4' width='380' height='230' style='position:absolute; left:390px; top:240px; border: 1px solid gray;' preload="metadata" >
-		<source type="video/ogg" />
-		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다.
+		<source type="video/mp4" />
+<!-- 		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다. -->
+		Supported in HTML5-enabled browsers (Firefox 3.6 or later or Chrome).
 	</video>
 </div>
 
@@ -1780,7 +1913,7 @@ function vidplay() {
     <input type="range" id="seekBar" value="0" style="display: block;float: left; margin-left: 10px;">
     <input type="range" id="volumecontrol" min="0" max="1" step="0.1" value="1" style="display: block;float: left; margin-left: 270px;">
 <!--          볼륨:<input id="volumecontrol" type="range" max="1" step="any" onchange="updateVolume()"> -->
-    <button onclick="mute()" style="margin-left: 10px;">음소거</button> 
+    <button onclick="mute()" style="margin-left: 10px;">Mute</button> 
 </div> 
 
 <!-- 프레임 영역 -->
@@ -1808,7 +1941,7 @@ function vidplay() {
 </div>
 
 <!-- 추가 객체 영역 -->
-<div id="ioa_title" style="position:absolute; left:800px; top:345px; width:330px; height:50px;"><img src="<c:url value='/images/geoImg/title_02.jpg'/>" alt="객체추가리스트"></div>
+<div id="ioa_title" style="position:absolute; left:800px; top:345px; width:330px; height:50px;"><img src="<c:url value='/images/geoImg/title_02.jpg'/>" alt="Add Object List"></div>
 <div id='video_object_area' style='position:absolute; left:800px; top:365px; width:330px; height:210px; display:block; border:1px solid #999999; overflow-y:scroll;'>
 	<table id='object_table'>
 		<tr style='font-size:12px; height:20px;' class='col_black'>
@@ -1832,17 +1965,17 @@ function vidplay() {
 <!----------------------------------------------------- 서브 영역 ------------------------------------------------------------->
 
 <!-- 자막 삽입 다이얼로그 객체 -->
-<div id='caption_dialog' style='position:absolute; left:150px; top:730px; width:500px; height:150px; border:1px solid #999999; display:none;'>
+<div id='caption_dialog' style='position:absolute; left:150px; top:730px; width:540px; height:150px; border:1px solid #999999; display:none;'>
 	<div style='display:table; width:100%; height:100%;'>
 		<div align="center" style='display:table-cell; vertical-align:middle;'>
-			<table border='0' style="width:460px;">
+			<table border='0' style="width:520px;">
 				<tr><td width=65><label style="font-size:12px;">Font Size : </label></td>
 				<td><select id="caption_font_select" style="font-size:12px;"><option>Normal<option>H3<option>H2<option>H1</select></td>
 				<td><label style="font-size:12px;">Font Color : </label></td>
 				<td><input id="caption_font_color" type="text" class="iColorPicker" value="#FFFFFF" style="width:50px;"/></td>
 				<td><label style="font-size:12px;">BG Color : </label></td>
 				<td><input id="caption_bg_color" type="text" class="iColorPicker" value="#000000" style="width:50px;"/></td>
-				<td id='caption_checkbox_td'><input type="checkbox" name="caption_bg_checkbok" onclick="checkCaption();"/><label style="font-size:12px;">투명</label></td></tr>
+				<td id='caption_checkbox_td'><input type="checkbox" name="caption_bg_checkbok" onclick="checkCaption();"/><label style="font-size:12px;">Transparency</label></td></tr>
 				<tr><td colspan='7' id='caption_check'></td></tr>
 				<tr><td colspan='7'><hr/></td></tr>
 				<tr><td colspan='5'><input id="caption_text" type="text" style="width:90%; font-size:12px; border:solid 2px #777;"/></td>
@@ -1853,17 +1986,17 @@ function vidplay() {
 </div>
 
 <!-- 말풍선 삽입 다이얼로그 객체 -->
-<div id='bubble_dialog' style='position:absolute; left:150px; top:720px; width:500px; height:180px; border:1px solid #999999; display:none;'>
+<div id='bubble_dialog' style='position:absolute; left:150px; top:720px; width:540px; height:180px; border:1px solid #999999; display:none;'>
 	<div style='display:table; width:100%; height:100%;'>
 		<div align="center" style='display:table-cell; vertical-align:middle;'>
-			<table border='0' style="width:460px;">
+			<table border='0' style="width:520px;">
 				<tr><td width=65><label style="font-size:12px;">Font Size : </label></td>
 				<td><select id="bubble_font_select" style="font-size:12px;"><option>Normal<option>H3<option>H2<option>H1</select></td>
 				<td><label style="font-size:12px;">Font Color : </label></td>
 				<td><input id="bubble_font_color" type="text" class="iColorPicker" value="#FFFFFF" style="width:50px;"/></td>
 				<td><label style="font-size:12px;">BG Color : </label></td>
 				<td><input id="bubble_bg_color" type="text" class="iColorPicker" value="#000000" style="width:50px;"/></td>
-				<td id='bubble_checkbox_td'><input type="checkbox" name="bubble_bg_checkbok" onclick="checkBubble();"/><label style=" font-size:12px;">투명</label></td></tr>
+				<td id='bubble_checkbox_td'><input type="checkbox" name="bubble_bg_checkbok" onclick="checkBubble();"/><label style=" font-size:12px;">Transparency</label></td></tr>
 				<tr><td colspan='7' id='bubble_check'></td></tr>
 				<tr><td colspan='7'><hr/></td></tr>
 				<tr><td colspan='5'><textarea id="bubble_text" rows="3" style="width:90%; font-size:12px; border:solid 2px #777;"></textarea></td>
@@ -1920,7 +2053,7 @@ function vidplay() {
 					<input type='radio' name='geo_shape' value='rect'><label style="font-size:12px;">Rect</label>
 					<input type='radio' name='geo_shape' value='point' checked><label style="font-size:12px;">Point</label></td>
 					<td width='20'></td>
-					<td rowspan='3'><button class="ui-state-default ui-corner-all" style="width:80px; height:30px; font-size:12px;" onclick="setGeometry();">확인</button></td>
+					<td rowspan='3'><button class="ui-state-default ui-corner-all" style="width:80px; height:30px; font-size:12px;" onclick="setGeometry();">Confirm</button></td>
 				</tr>
 				<tr><td><hr/></td><td width='20'></td></tr>
 				<tr>
@@ -1942,9 +2075,12 @@ function vidplay() {
 			<table id="upload_table" border='0'>
 				<tr>
 					<td colspan="2" width="450">
-						<div><input type="radio" value="0" name="shareRadio">비공개</div>
-						<div><input type="radio" value="1" name="shareRadio">전체공개</div>
-						<div><input type="radio" value="2" name="shareRadio" onclick="videoGetShareUser();">특정인 공개</div>
+<!-- 						<div><input type="radio" value="0" name="shareRadio">비공개</div> -->
+<!-- 						<div><input type="radio" value="1" name="shareRadio">전체공개</div> -->
+<!-- 						<div><input type="radio" value="2" name="shareRadio" onclick="videoGetShareUser();">특정인 공개</div> -->
+						<div><input type="radio" value="0" name="shareRadio">Nondisclosure</div>
+						<div><input type="radio" value="1" name="shareRadio">Full disclosure</div>
+						<div><input type="radio" value="2" name="shareRadio" onclick="imgGetShareUser();">Selective disclosure</div>
 <!-- 						<select id="showKind"></select> -->
 					</td>
 				</tr>
@@ -1987,10 +2123,10 @@ function vidplay() {
 </div>
 
 <!-- 저장 버튼 다이얼로그 객체 -->
-<div id='save_dialog' class='save_dialog' title='저장 방식 선택'>
-	<button class='ui-state-default ui-corner-all' style='width:300px; height:40px; font-size:11px;' onclick='saveVideoWrite(1);'>영상 정보에 저장</button><br/><br/>
-	<button class='ui-state-default ui-corner-all' style='width:300px; height:40px; font-size:11px;' onclick='saveVideoWrite(2);'>XML 로 저장</button><br/><br/>
-	<button class='ui-state-default ui-corner-all' style='width:300px; height:40px; font-size:11px;' onclick='saveVideoWrite(3);'>XML 문자열 보기</button>
+<div id='save_dialog' class='save_dialog' title='Select storage method'>
+	<button class='ui-state-default ui-corner-all' style='width:300px; height:40px; font-size:11px;' onclick='saveVideoWrite1(1);'>Save to image information</button><br/><br/>
+	<button class='ui-state-default ui-corner-all' style='width:300px; height:40px; font-size:11px;' onclick='saveVideoWrite1(2);'>Save as XML</button><br/><br/>
+	<button class='ui-state-default ui-corner-all' style='width:300px; height:40px; font-size:11px;' onclick='saveVideoWrite1(3);'>View XML string</button>
 </div>
 
 </body>

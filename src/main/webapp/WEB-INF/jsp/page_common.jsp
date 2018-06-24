@@ -36,14 +36,24 @@ var baseRoot = function(){
 };
 
 var videoBaseUrl = function(){ 
-	var br = "http://turbosoft1.iptime.org/shares/GeoCMS";
+	var br = "";
+	if(b_serverType == "URL"){
+		br = "http://"+ b_serverUrl + ":" + b_serverViewPort +"/shares/" + b_serverPath;
+	}else{
+		br = "http://"+ location.host + "/GeoCMS/" + b_serverPath;
+	}
 	return br;
 };
 
 var videoOutUrl = function(){ 
-	var br = "http://turbosoft1.iptime.org:2125";
+	var br = "http://"+ location.host;
 	return br;
 };
+
+var b_serverType = "LOCAL";
+var b_serverUrl = "";
+var b_serverViewPort = "";
+var b_serverPath = "";
 
 var dataReplaceFun = function(oldData){
 	var replaceResultData = "";

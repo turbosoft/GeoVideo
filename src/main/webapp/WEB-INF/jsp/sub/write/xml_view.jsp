@@ -21,7 +21,6 @@ function init() {
 	$('#xml_textarea').val(xml_data);
 }
 
-
 </script>
 
 </head>

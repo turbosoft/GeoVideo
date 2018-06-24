@@ -15,6 +15,10 @@ var marker;
 
 var marker_latlng;
 
+var vDMarkerLat = 0;		//default marker latitude
+var vDMarkerLng = 0;		//default marker longitude
+var vDMapZoom = 10;		//defalut map zoom
+
 function init() {
 	if(map == null){
 		//set map option
@@ -24,12 +28,29 @@ function init() {
 	}
 }
 
+//base map setting
+function setDefaultData(dMarkerLat, dMarkerLng, dMapZoom){
+	vDMarkerLat = dMarkerLat;
+	vDMarkerLng = dMarkerLng;
+	vDMapZoom = dMapZoom;
+}
+
 /* --------------------- 초기 설정 함수 --------------------*/
 
 //촬영 지점 설정
 function setCenter(lat, lng) {
-	if(lat!=0 && lng!=0) { marker_latlng = new google.maps.LatLng(lat, lng); map.setZoom(16); }
-	else { marker_latlng = new google.maps.LatLng(37.5663889, 126.9997222); map.setZoom(10); }
+	if(lat!=0 && lng!=0) {
+		marker_latlng = new google.maps.LatLng(lat, lng); map.setZoom(16);
+	}else {
+		if(vDMarkerLat == null || vDMarkerLat == ""){
+			vDMarkerLat = 37.5663889;
+    	}
+    	if(vDMarkerLng == null || vDMarkerLng == ""){
+    		vDMarkerLng = 126.9997222;
+    	}
+		marker_latlng = new google.maps.LatLng(vDMarkerLat, vDMarkerLng);
+		map.setZoom(vDMapZoom);
+	}
 	
 	var marker_image = "<c:url value='/images/geoImg/maps/video_marker.png'/>";
 	var marker_image2 = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
@@ -88,7 +109,8 @@ function setGPSData(lat_arr, lng_arr) {
 			}
 		}
 	}
-	else { jAlert('GPS 파일의 Latitude 와 Longitude 가 맞지 않습니다.', '정보'); }
+// 	else { jAlert('GPS 파일의 Latitude 와 Longitude 가 맞지 않습니다.', '정보'); }
+	else { jAlert('The Latitude and Longitude of the GPS file do not match.', 'Info'); }
 	setDirection(poly_arr);
 }
 
