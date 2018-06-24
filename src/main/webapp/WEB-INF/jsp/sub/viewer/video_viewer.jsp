@@ -998,7 +998,15 @@ function changeImg(text){
 }
 
 function videoViewClose(){
-	jQuery.FrameDialog.closeDialog();	//뷰어 닫기
+// 	jQuery.FrameDialog.closeDialog();	//뷰어 닫기
+	var iframes = window.parent.document.getElementsByTagName("IFRAME");
+	for (var i = 0; i < iframes.length; i++) {
+		var id = iframes[i].id || iframes[i].name || i;
+		if (window.parent.frames[id] == window && jQuery.type( id ) != 'number') {
+			var tmpID = id.replace("-VIEW", "");
+			window.parent.jQuery("#" + tmpID).dialog('close');
+		}
+	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
