@@ -1241,7 +1241,6 @@ function saveVideoWrite(type, tmpServerId, tmpServerPass, tmpServerPort) {
 			 jAlert('Please enter your details.', 'Info');
 			 return;
 		 }
-		 
 		 if(tmpShareType != null && tmpShareType == 2 && (tmpAddShareUser == null || tmpAddShareUser == '') && oldShareUserLen == 0){
 // 			 jAlert('공유 유저가 지정되지 않았습니다.', '정보');
 			 jAlert('No sharing user specified.', 'Info');
@@ -1286,7 +1285,6 @@ function saveVideoWrite(type, tmpServerId, tmpServerPass, tmpServerPort) {
 						var Url			= baseRoot() + "cms/updateVideo/";
 						var param		= loginToken + "/" + loginId + "/" + idx + "/" + tmpTitle + "/" + tmpContent + "/" + tmpShareType + "/" + tmpAddShareUser + "/" + tmpRemoveShareUser + "/" + tmp_xml_text +"/" + tmpEditYes + "/" + tmpEditNo;
 						var callBack	= "?callback=?";
-						
 						$.ajax({
 							type	: "POST"
 							, url	: Url + param + callBack
@@ -2080,7 +2078,7 @@ function vidplay() {
 <!-- 						<div><input type="radio" value="2" name="shareRadio" onclick="videoGetShareUser();">특정인 공개</div> -->
 						<div><input type="radio" value="0" name="shareRadio">Nondisclosure</div>
 						<div><input type="radio" value="1" name="shareRadio">Full disclosure</div>
-						<div><input type="radio" value="2" name="shareRadio" onclick="imgGetShareUser();">Selective disclosure</div>
+						<div><input type="radio" value="2" name="shareRadio" onclick="videoGetShareUser();">Selective disclosure</div>
 <!-- 						<select id="showKind"></select> -->
 					</td>
 				</tr>
