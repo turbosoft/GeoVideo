@@ -34,6 +34,7 @@ var upload_url = '';
 var icon_css = ' style="width: 25px; height: 25px; margin: 3px; cursor:pointer;" ';
 
 var video_child_len = 1;
+var video0 = document.getElementById("video_player0");
 var video1 = document.getElementById("video_player1");
 var video2 = document.getElementById("video_player2");
 var video3 = document.getElementById("video_player3");
@@ -256,14 +257,33 @@ function changeVideo() {
 			, success: function(data) {
 				if(data.Code == 100){
 					var response = data.Data;
-
+					video_child_len = 1;
 					if(response != null && response != ''){
 						video_child_len = response.length;
+						$('#video_player2').css('background','none');
+						$('#video_player3').css('background','none');
+						$('#video_player4').css('background','none');
+						
 						for(var k=0;k<response.length; k++){
 							var tmpFileName = response[k].filename;
-							var video = document.getElementById('video_player'+(k+1));
-							video.src = videoBaseUrl() + upload_url + tmpFileName;
-							video.load();
+							
+							if(video_child_len > 1 ){
+								$('.multi_class').css('display','block');
+								$('#video_player0').css('display','none');
+								var video = document.getElementById('video_player'+(k+1));
+								video.src = videoBaseUrl() + upload_url + tmpFileName;
+								video.load();
+							}else{
+								$('.multi_class').css('display','none');
+								$('#video_player0').css('display','block');
+								var video = document.getElementById('video_player0');
+								video.src = videoBaseUrl() + upload_url + tmpFileName;
+								video.load();
+							}
+							
+// 							var video = document.getElementById('video_player'+(k+1));
+// 							video.src = videoBaseUrl() + upload_url + tmpFileName;
+// 							video.load();
 							
 							if(k == 0){
 								file_url =  response[k].filename;
@@ -278,22 +298,25 @@ function changeVideo() {
 							loadGPSForData(gpsDataStr);
 						}
 						
-						if(video_child_len < 4){
-							var tmpHtmlStr = "<div style='width:380px; height:230px;'>No video</div>";
-							$('#video_player4').css('background','url("../images/geoImg/novideo.png")');
-							$('#video_player4').css('board','none');
-						}
-						if(video_child_len < 3){
-							var tmpHtmlStr = "<div style='width:380px; height:230px;'>No video</div>";
-							$('#video_player3').css('background','url("../images/geoImg/novideo.png")');
-							$('#video_player3').css('board','none');
-						}
-						if(video_child_len < 2){
-							var tmpHtmlStr = "<div style='width:380px; height:230px;'>No video</div>";
-							$('#video_player2').css('background','url("../images/geoImg/novideo.png")');
-							$('#video_player2').css('board','none');
+						if(video_child_len > 1){
+							if(video_child_len < 4){
+								var tmpHtmlStr = "<div style='width:380px; height:230px;'>No video</div>";
+								$('#video_player4').css('background','url("../images/geoImg/novideo.png")');
+								$('#video_player4').css('board','none');
+							}
+							if(video_child_len < 3){
+								var tmpHtmlStr = "<div style='width:380px; height:230px;'>No video</div>";
+								$('#video_player3').css('background','url("../images/geoImg/novideo.png")');
+								$('#video_player3').css('board','none');
+							}
+							if(video_child_len < 2){
+								var tmpHtmlStr = "<div style='width:380px; height:230px;'>No video</div>";
+								$('#video_player2').css('background','url("../images/geoImg/novideo.png")');
+								$('#video_player2').css('board','none');
+							}
 						}
 						
+						video0 = document.getElementById("video_player0");
 						video1 = document.getElementById("video_player1");
 						video2 = document.getElementById("video_player2");
 						video3 = document.getElementById("video_player3");
@@ -1713,12 +1736,20 @@ function vidplay() {
 	
     var button = document.getElementById("play");
     if(videoLoding == 0){
-    	if(!video1.ended){
-    		video1.play();
-    	}
-    	if(video_child_len > 1 && !video2.ended){
-    		video2.play();
-    	}
+    	
+    	if(video_child_len == 1){
+    		if(!video0.ended){
+        		video0.play();
+        	}
+    	}else if(video_child_len > 1){
+    		if(!video1.ended){
+        		video1.play();
+        	}
+    		if(!video2.ended){
+        		video2.play();
+        	}
+    	}	
+    
     	if(video_child_len > 2 && !video3.ended){
     		video3.play();
     	}
@@ -1728,8 +1759,12 @@ function vidplay() {
     	button.textContent = "||";
         videoLoding = 1;
     }else{
-    	video1.pause();
-    	if(video_child_len > 1){video2.pause();}
+    	if(video_child_len == 1){
+    		video0.pause();
+    	}else if(video_child_len > 1){
+    		video1.pause();
+    		video2.pause();
+    	}
     	if(video_child_len > 2){video3.pause();}
     	if(video_child_len > 3){video4.pause();}
         
@@ -1739,8 +1774,12 @@ function vidplay() {
  }
 
  function restart(reType) {
-     video1.currentTime = 0;
-     if(video_child_len > 1){video2.currentTime = 0;}
+     if(video_child_len == 1){
+		 video0.currentTime = 0;
+	 }else if(video_child_len > 1){
+		 video1.currentTime = 0;
+		 video2.currentTime = 0;
+	 }
  	 if(video_child_len > 2){video3.currentTime = 0;}
  	 if(video_child_len > 3){video4.currentTime = 0;}
      
@@ -1750,24 +1789,37 @@ function vidplay() {
  }
 
  function skip(value) {
-	 video1.currentTime += value;
-     if(video_child_len > 1){video2.currentTime += value;}
+	 if(video_child_len == 1){
+		 video0.currentTime += value; 
+ 	 }else if(video_child_len > 1){
+ 		 video1.currentTime += value;
+ 		 video2.currentTime += value;
+ 	 }
+	 
  	 if(video_child_len > 2){video3.currentTime += value;}
  	 if(video_child_len > 3){video4.currentTime += value;}
  }
  
 //볼륨조절        
  function updateVolume() {
-     video1.volume = volumecontrol.value;
-     if(video_child_len > 1){video2.volume = volumecontrol.value;}
+     if(video_child_len == 1){
+		 video0.volume = volumecontrol.value;
+ 	 }else if(video_child_len > 1){
+ 		 video1.volume = volumecontrol.value;
+ 		 video2.volume = volumecontrol.value;
+ 	 }
  	 if(video_child_len > 2){video3.volume = volumecontrol.value;}
  	 if(video_child_len > 3){video4.volume = volumecontrol.value;}
  }
  
 //음소거
  function mute(){
-     video1.muted = !video.muted;
-     if(video_child_len > 1){video2.muted = !video2.muted;}
+     if(video_child_len == 1){
+		 video0.muted = !video0.muted;
+ 	 }else if(video_child_len > 1){
+ 		 video1.muted = !video1.muted;
+ 		 video2.muted = !video2.muted;
+ 	 }
  	 if(video_child_len > 2){video3.muted = !video3.muted;}
  	 if(video_child_len > 3){video4.muted = !video4.muted;}
  }
@@ -1776,12 +1828,20 @@ function vidplay() {
 	var mainVideo;
     var resdu = 0;
 	
-    var du1 = parseInt(video1.duration);
+    var du1 = 0;
     var videoObject = new Object();
+    
+    if(video_child_len == 1){
+   	 du1 = parseInt(video0.duration);
+   	 videoObject.video = video0;
+   	 mainVideo = video0;
+	 }else if(video_child_len > 1){
+		 du1 = parseInt(video1.duration);
+		 videoObject.video = video1;
+		 mainVideo = video1;
+	 }
     videoObject.duration = du1;
-    videoObject.video = video1;
     resdu = du1;
-    mainVideo = video1;
      
     var tmpObjArr = new Array();
     tmpObjArr.push(videoObject);
@@ -1808,24 +1868,34 @@ function vidplay() {
     	tmpObjArr.push(videoObject);
     }
     
-   	for(k=1;k<tmpObjArr.length;k++){
-    	if(tmpObjArr[k].duration > resdu){
-    		resdu = tmpObjArr[k].duration;
-    		mainVideo = tmpObjArr[k].video;
-    	}
+    if(tmpObjArr != null && tmpObjArr.length > 1){
+   	 for(k=1;k<tmpObjArr.length;k++){
+       	 if(tmpObjArr[k].duration > resdu){
+       		 resdu = tmpObjArr[k].duration;
+       		 mainVideo = tmpObjArr[k].video;
+       	 }
+        }
     }
 	
 	var seekBar = document.getElementById("seekBar");
 	seekBar.addEventListener("mousedown", function(e){
-	    video1.pause();
-	    if(video_child_len > 1){video2.pause();}
+	    if(video_child_len == 1){
+	    	video0.pause();
+	 	}else if(video_child_len > 1){
+	 		video1.pause();
+	 		video2.pause();
+	 	}
 	 	if(video_child_len > 2){video3.pause();}
 	 	if(video_child_len > 3){video4.pause();}
 	});
 	
 	seekBar.addEventListener("mouseup", function(e){
 		var vTime = parseInt(mainVideo.duration * (this.value / 100), 10);
-	    video1.currentTime = vTime;
+		if(video_child_len == 1){
+			video0.currentTime = vTime;
+	 	}else if(video_child_len > 1){
+	 		video1.currentTime = vTime;
+	 	}
 	     
 	    if(video_child_len > 1){
 	    	if(vTime > video2.dutation){
@@ -1876,27 +1946,32 @@ function vidplay() {
 <!-- 탭 , 공유 우저 영역 -->
 <div id="showInfoDiv" style="position:absolute; left:805px; top:13px; color:white;display: none;">
 <!-- 	<div> TabName : <label id="showKindLabel"></label></div> -->
-	<div style="margin-top: 5px;"> Sharing settings : <label id="shareKindLabel"></label></div>
+	<div style="margin-top: 5px;"> Sharing settings : <label id="shareKindLabel" style="display: block;"></label></div>
 </div>
 
 <!-- 저작 영역 -->
 <div id='video_main_area' style='position:absolute; left:10px; top:70px; width:780px; height:510px; display:block; border:1px solid #999999;'>
-	<video id='video_player1' width='380' height='230' style='position:absolute; left:10px; top:10px; border: 1px solid gray;' preload="metadata">
+	<video id='video_player0' width='760' height='460' style='position:absolute; left:10px; top:10px; border: 1px solid gray;' preload="metadata">
+		<source type='video/mp4'></source>
+<!-- 		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다. -->
+		Supported in HTML5-enabled browsers (Firefox 3.6 or later or Chrome).
+	</video>
+	<video id='video_player1' class='multi_class' width='380' height='230' style='position:absolute; left:10px; top:10px; border: 1px solid gray; display: none;' preload="metadata">
 		<source id='video_src' src='' type='video/mp4'></source>
 <!-- 		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다. -->
 		Supported in HTML5-enabled browsers (Firefox 3.6 or later or Chrome).
 	</video>
-	<video id='video_player2' width='380' height='230' style='position:absolute; left:390px; top:10px; border: 1px solid gray;' preload="metadata" >
+	<video id='video_player2' class='multi_class' width='380' height='230' style='position:absolute; left:390px; top:10px; border: 1px solid gray; display: none;' preload="metadata" >
 		<source type="video/mp4" />
 <!-- 		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다. -->
 		Supported in HTML5-enabled browsers (Firefox 3.6 or later or Chrome).
 	</video>
-	<video id='video_player3' width='380' height='230' style='position:absolute; left:10px; top:240px; border: 1px solid gray;' preload="metadata" >
+	<video id='video_player3' class='multi_class' width='380' height='230' style='position:absolute; left:10px; top:240px; border: 1px solid gray; display: none;' preload="metadata" >
 		<source type="video/mp4" />
 <!-- 		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다. -->
 		Supported in HTML5-enabled browsers (Firefox 3.6 or later or Chrome).
 	</video>
-	<video id='video_player4' width='380' height='230' style='position:absolute; left:390px; top:240px; border: 1px solid gray;' preload="metadata" >
+	<video id='video_player4' class='multi_class' width='380' height='230' style='position:absolute; left:390px; top:240px; border: 1px solid gray; display: none;' preload="metadata" >
 		<source type="video/mp4" />
 <!-- 		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다. -->
 		Supported in HTML5-enabled browsers (Firefox 3.6 or later or Chrome).
