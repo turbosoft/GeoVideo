@@ -1206,7 +1206,7 @@ function saveVideoWrite(type, tmpServerId, tmpServerPass, tmpServerPort) {
 		var id = obj.attr('id');
 		if(id=='') { obj = obj.children().eq(0); id = obj.attr('id'); }
 		
-		if(id!='video_player1' && id!='video_player2' && id!='video_player3' && id!='video_player4') {
+		if(id!='video_player0' && id!='video_player1' && id!='video_player2' && id!='video_player3' && id!='video_player4') {
 			var buf1 = $('#frame'+id).css('top'); var frame_line = parseInt(buf1.replace('px',''));
 			var buf2 = $('#frame'+id).css('left'); var frame_start = parseInt(buf2.replace('px',''));
 			var buf3 = $('#frame'+id).css('width'); var frame_end = parseInt(buf3.replace('px','')) + frame_start;
