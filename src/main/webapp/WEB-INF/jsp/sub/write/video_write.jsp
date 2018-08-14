@@ -117,7 +117,7 @@ function getOneVideoData(){
 					$('#title_area').val(response.title);
 					$('#content_area').val(response.content);
 // 					var nowShareTypeText = nowShareType == 0? '비공개':nowShareType== 1? '전체공개':'특정인 공개';
-					var nowShareTypeText = nowShareType == 0? 'Nondisclosure':nowShareType== 1? 'Full disclosure':'Selective disclosure';
+					var nowShareTypeText = nowShareType == 0? "private":nowShareType== 1? "public":"sharing with friends";
 					
 					$('#shareKindLabel').text(nowShareTypeText);
 					
@@ -1016,8 +1016,8 @@ function inputGeometryShape(type) {
 	canvas_element.appendTo('#video_main_area');
 	
 	//그리기 완료 및 그리기 취소 버튼
-	var html_text = '<button class="geometry_complete_button" onclick="createGeometry('+type+');" style="left:0px; top:0px;">그리기 완료</button>';
-	html_text += '<button class="geometry_cancel_button" onclick="cancelGeometry();" style="left:10px; top:0px;">그리기 취소</button>';
+	var html_text = '<button class="geometry_complete_button" onclick="createGeometry('+type+');" style="left:0px; top:0px;">Draw complete</button>';
+	html_text += '<button class="geometry_cancel_button" onclick="cancelGeometry();" style="left:10px; top:0px;">Undo drawing</button>';
 	$('#video_main_area').append(html_text);
 	$('.geometry_complete_button').button(); $('.geometry_cancel_button').button();
 	$('.geometry_complete_button').width(100); $('.geometry_cancel_button').width(100);
@@ -1984,9 +1984,9 @@ function vidplay() {
     <button id="play" onclick="vidplay()" style="display: block;float: left; margin-left: 10px;">&gt;</button>
     <button id="fastFwd" onclick="skip(10)" style="display: block;float: left; margin-left: 10px;">&gt;&gt;</button>
     <input type="range" id="seekBar" value="0" style="display: block;float: left; margin-left: 10px;">
-    <input type="range" id="volumecontrol" min="0" max="1" step="0.1" value="1" style="display: block;float: left; margin-left: 270px;">
+    <input type="range" id="volumecontrol" min="0" max="1" step="0.1" value="1" style="display: block;float: left; margin-left: 270px;" onchange="updateVolume();">
 <!--          볼륨:<input id="volumecontrol" type="range" max="1" step="any" onchange="updateVolume()"> -->
-    <button onclick="mute()" style="margin-left: 10px;">Mute</button> 
+    <button onclick="mute();" style="margin-left: 10px;">Mute</button> 
 </div> 
 
 <!-- 프레임 영역 -->
@@ -2151,9 +2151,9 @@ function vidplay() {
 <!-- 						<div><input type="radio" value="0" name="shareRadio">비공개</div> -->
 <!-- 						<div><input type="radio" value="1" name="shareRadio">전체공개</div> -->
 <!-- 						<div><input type="radio" value="2" name="shareRadio" onclick="videoGetShareUser();">특정인 공개</div> -->
-						<div><input type="radio" value="0" name="shareRadio">Nondisclosure</div>
-						<div><input type="radio" value="1" name="shareRadio">Full disclosure</div>
-						<div><input type="radio" value="2" name="shareRadio" onclick="videoGetShareUser();">Selective disclosure</div>
+						<div><input type="radio" value="0" name="shareRadio">private</div>
+						<div><input type="radio" value="1" name="shareRadio">public</div>
+						<div><input type="radio" value="2" name="shareRadio" onclick="videoGetShareUser();">sharing with friends</div>
 <!-- 						<select id="showKind"></select> -->
 					</td>
 				</tr>
@@ -2197,9 +2197,9 @@ function vidplay() {
 
 <!-- 저장 버튼 다이얼로그 객체 -->
 <div id='save_dialog' class='save_dialog' title='Select storage method'>
-	<button class='ui-state-default ui-corner-all' style='width:300px; height:40px; font-size:11px;' onclick='saveVideoWrite1(1);'>Save to image information</button><br/><br/>
-	<button class='ui-state-default ui-corner-all' style='width:300px; height:40px; font-size:11px;' onclick='saveVideoWrite1(2);'>Save as XML</button><br/><br/>
-	<button class='ui-state-default ui-corner-all' style='width:300px; height:40px; font-size:11px;' onclick='saveVideoWrite1(3);'>View XML string</button>
+	<button class='ui-state-default ui-corner-all' style='width:300px; height:40px; font-size:11px;' onclick='saveVideoWrite1(1);'>export to XML</button><br/><br/>
+<!-- 	<button class='ui-state-default ui-corner-all' style='width:300px; height:40px; font-size:11px;' onclick='saveVideoWrite1(2);'>Save as XML</button><br/><br/> -->
+	<button class='ui-state-default ui-corner-all' style='width:300px; height:40px; font-size:11px;' onclick='saveVideoWrite1(3);'>view XML string</button>
 </div>
 
 </body>
