@@ -108,7 +108,7 @@ function httpRequest(textUrl){
 			}else{
 				base_url = '<c:url value="/"/>';
 				upload_url = '/upload/';
-				$('body').append('<button class="video_write_button" style="position:absolute; left:380px; top:780px; width:140px; height:35px; display:block; cursor: pointer;" onclick="videoWrite();">Writer</button>');
+				$('body').append('<button class="video_write_button" style="position:absolute; left:10px; top:530px; width:300px; height:35px; display:block; cursor: pointer;" onclick="videoWrite();">Edit Annotaion</button>');
 				$('.viewerCloseBtn').css('display','block');
 				$('#iframeSrc').text("<iframe width='760' height='500' src='"+ videoOutUrl() +"/GeoVideo/geoVideo/video_viewer.do?file_url="+ file_url+ "' frameborder='0' allowfullscreen></iframe>");
 			}
@@ -125,10 +125,10 @@ function btnViewCheck(){
 	$('.viewerCloseBtn').css('display','none');
 	
 	if(loginId != null && loginId != '' && loginId != 'null' && ((loginId == user_id && loginType != 'WRITE') || loginType == 'ADMIN')){
-		$('body').append('<button class="video_write_button" style="position:absolute; left:380px; top:780px; width:140px; height:35px; display:block; cursor: pointer;" onclick="videoWrite();">Writer</button>');
+		$('body').append('<button class="video_write_button" style="position:absolute; left:10px; top:530px; width:300px; height:35px; display:block; cursor: pointer;" onclick="videoWrite();">Edit Annotaion</button>');
 		$('.viewerCloseBtn').css('display','block');
 	}else if(editUserCheck() == 1 ||  (loginId != null && loginId != '' && loginId != 'null' && projectUserId == loginId)){
-		$('body').append('<button class="video_write_button" style="position:absolute; left:380px; top:780px; width:140px; height:35px; display:block; cursor: pointer;" onclick="videoWrite();">Writer</button>');
+		$('body').append('<button class="video_write_button" style="position:absolute; left:10px; top:530px; width:300px; height:35px; display:block; cursor: pointer;" onclick="videoWrite();">Edit Annotaion</button>');
 		$('.viewerCloseBtn').css('display','block');
 	}
 }
@@ -1099,21 +1099,21 @@ function loadGPSForData(gpsData){
 var resize_map_state = 1;
 var resize_scale = 150;
 var init_map_left, init_map_top, init_map_width, init_map_height;
-function resizeMap() {
-	if(resize_map_state==1) {
-		init_map_left = 800;
-		init_map_top = 295;
-		init_map_width = $('#video_map_area').width();
-		init_map_height = $('#video_map_area').height();
-		resize_map_state=2;
-		$('#video_map_area').animate({left:init_map_left-resize_scale, top:init_map_top-resize_scale, width:init_map_width+resize_scale, height:init_map_height+resize_scale},"slow", function() {  $('#resize_map_btn').css('background-image','url(<c:url value="/images/geoImg/icon_map_min.jpg"/>)');});
-	}
-	else if(resize_map_state==2) {
-		resize_map_state=1;
-		$('#video_map_area').animate({left:init_map_left, top:init_map_top, width:init_map_width, height:init_map_height},"slow", function() {  $('#resize_map_btn').css('background-image','url(<c:url value="/images/geoImg/icon_map_max.jpg"/>)');});
-	}
-	else {}
-}
+// function resizeMap() {
+// 	if(resize_map_state==1) {
+// 		init_map_left = 800;
+// 		init_map_top = 295;
+// 		init_map_width = $('#video_map_area').width();
+// 		init_map_height = $('#video_map_area').height();
+// 		resize_map_state=2;
+// 		$('#video_map_area').animate({left:init_map_left-resize_scale, top:init_map_top-resize_scale, width:init_map_width+resize_scale, height:init_map_height+resize_scale},"slow", function() {  $('#resize_map_btn').css('background-image','url(<c:url value="/images/geoImg/icon_map_min.jpg"/>)');});
+// 	}
+// 	else if(resize_map_state==2) {
+// 		resize_map_state=1;
+// 		$('#video_map_area').animate({left:init_map_left, top:init_map_top, width:init_map_width, height:init_map_height},"slow", function() {  $('#resize_map_btn').css('background-image','url(<c:url value="/images/geoImg/icon_map_max.jpg"/>)');});
+// 	}
+// 	else {}
+// }
 
 //저작
 function videoWrite() {
@@ -1799,7 +1799,7 @@ function vidplay() {
 <!---------------------------------------------------- 메인 영역 시작 ------------------------------------------------>
 
 <!-- 비디오 영역 -->
-<div id='video_main_area' style='position:absolute; left:10px; top:15px; width:780px; height:555px; display:block; border:1px solid #999999;'>
+<div id='video_main_area' style='position:absolute; left:320px; top:15px; width:780px; height:555px; display:block; border:1px solid #999999;'>
 <!-- 	<video id='video_player' width='760' height='500' controls='true' style='position:absolute; left:10px; top:10px;'> -->
 <!-- 		<source id='video_src' src='' type='video/ogg'></source> -->
 <!-- 		<source src="http://localhost:8088/GeoCMS/upload/GeoVideo/aaaaa(1)_ogg.ogg" type="video/ogg" /> -->
@@ -1833,18 +1833,18 @@ function vidplay() {
 	</video>
 	
 </div>
-<div id="buttonbar" style="position: absolute; left: 30px; top:510px;">
+<div id="buttonbar" style="position: absolute; left: 340px; top:510px;">
     <button id="restart" onclick="restart('');" style="display: block;float: left;">[]</button> 
     <button id="rew" onclick="skip(-10)" style="display: block;float: left; margin-left: 10px;">&lt;&lt;</button>
     <button id="play" onclick="vidplay()" style="display: block;float: left; margin-left: 10px;">&gt;</button>
     <button id="fastFwd" onclick="skip(10)" style="display: block;float: left; margin-left: 10px;">&gt;&gt;</button>
     <input type="range" id="seekBar" value="0" style="display: block;float: left; margin-left: 10px;">
-    <input type="range" id="volumecontrol" min="0" max="1" step="0.1" value="1" style="display: block;float: left; margin-left: 270px;">
-    <button onclick="mute()" style="margin-left: 10px;">Mute</button> 
+    <input type="range" id="volumecontrol" min="0" max="1" step="0.1" value="1" style="display: block;float: left; margin-left: 270px;" onchange="updateVolume();">
+    <button onclick="mute();" style="margin-left: 10px;">Mute</button> 
 </div> 
 
-<button  onclick='iframeSrcView();' style='position:absolute; left:20px; top:545px;'>Source Code</button>
-<textarea id="iframeSrc" style='position:absolute; left:120px; top:545px; width:660px; height:35px; overflow-x:hidden; line-height: 17px; font-size:12px; display:none;' readonly="readonly">
+<button  onclick='iframeSrcView();' style='position:absolute; left:340px; top:545px;'>Source Code</button>
+<textarea id="iframeSrc" style='position:absolute; left:340px; top:565px; width:660px; height:35px; overflow-x:hidden; line-height: 17px; font-size:12px; display:none;' readonly="readonly">
 </textarea>
 
 <div id="video_obj_area" style="display:none;"></div>
@@ -1865,8 +1865,8 @@ function vidplay() {
 
 
 <!-- 추가 객체 영역 -->
-<div id="ioa_title" style='position:absolute; left:797px; top:12px; width:330px; height:245px;'><img src="<c:url value='/images/geoImg/title_02.jpg'/>" alt="Add Object List"></div>
-<div id='video_object_area' style='position:absolute; left:800px; top:33px; width:300px; height:230px; display:block; border:1px solid #999999; overflow-y:scroll;'>
+<div id="ioa_title" style='position:absolute; left:10px; top:300px; width:300px; height:20px;'><img src="<c:url value='/images/geoImg/title_02.jpg'/>" alt="Add Object List"></div>
+<div id='video_object_area' style='position:absolute; left:10px; top:320px; width:300px; height:200px; display:block; border:1px solid #999999; overflow-y:scroll;'>
 	<table id='object_table'>
 		<tr style='font-size:12px; height:20px;' class='col_black'>
 			<td width=50 class='anno_head_tr'>ID</td>
@@ -1877,17 +1877,17 @@ function vidplay() {
 </div>
 
 <!-- 지도 영역 -->
-<div id="ima_title"><img src="<c:url value='/images/geoImg/title_04.gif'/>" style="position:absolute; left:800px; top:272px;" alt="Map"></div>
-<div id='video_map_area' style='position:absolute; left:800px; top:295px; width:300px; height:260px; display:block; background-color:#999; border:1px solid #999999;'>
+<div id="ima_title"><img src="<c:url value='/images/geoImg/title_04.gif'/>" style="position:absolute; left:10px; top:12px;" alt="Map"></div>
+<div id='video_map_area' style='position:absolute; left:10px; top:33px; width:300px; height:260px; display:block; background-color:#999; border:1px solid #999999;'>
 	<iframe id='googlemap' src='<c:url value="/geoVideo/video_googlemap.do"/>' style='width:100%; height:100%; margin:1px; border:none;'></iframe>
-	<div id='resize_map_btn' onclick='resizeMap();' style='position:absolute; left:0px; top:0px; width:30px; height:30px; cursor:pointer; background-image:url(<c:url value='/images/geoImg/icon_map_max.jpg'/>);'>
-	</div>
+<%-- 	<div id='resize_map_btn' onclick='resizeMap();' style='position:absolute; left:0px; top:0px; width:30px; height:30px; cursor:pointer; background-image:url(<c:url value='/images/geoImg/icon_map_max.jpg'/>);'> --%>
+<!-- 	</div> -->
 </div>
 
 <!----------------------------------------------------- 메인 영역 끝 ----------------------------------------------- -->
 
 <!-- 저작 버튼 -->
-	<button style="position:absolute; left:580px; top:780px; width:140px; height:35px; display:none; cursor: pointer;" onclick="videoViewClose();" class="viewerCloseBtn">Close</button>
+<!-- 	<button style="position:absolute; left:580px; top:780px; width:140px; height:35px; display:none; cursor: pointer;" onclick="videoViewClose();" class="viewerCloseBtn">Close</button> -->
 </body>
 
 </html>
