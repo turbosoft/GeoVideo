@@ -1939,8 +1939,10 @@ function vidplay() {
 	<div style="width: 18%; float: left;" class="menuIcon"><img src="<c:url value='/images/geoImg/write/image_btn.png'/>" onclick='inputIcon();' style="cursor: pointer; width: 150px; height: 40px; margin-top: 10px; margin-left:3%;"></div>
 	<div style="width: 18%; float: left;" class="menuIcon"><img src="<c:url value='/images/geoImg/write/geo_btn.png'/>" onclick='inputGeometry();' style="cursor: pointer; width: 150px; height: 40px; margin-top: 10px; margin-left:3%;"></div>
 	<div style="width: 18%; float: left; display: none;" class="menuIcon menuIconData"><img src="<c:url value='/images/geoImg/write/data_btn.png'/>" onclick='dataChangeClick();' style="cursor: pointer; width: 30px; height: 40px; margin-top: 10px; margin-left:25%;"></div>
-	<input type="button" onclick='closeVideoWrite();' class='close_btn' value="Close">
-	<input type="button" onclick='saveSetting();' class='save_btn' value="Save">
+	<input type="button" onclick='closeVideoWrite();' class='close_btn' value="Close" style="margin:17px 15px 17px 5px;">
+	<input type="button" onclick='saveVideoWrite1(3);' class='save_btn' value="View XML">
+	<input type="button" onclick='saveVideoWrite1(1);' class='save_btn' value="Save">
+<!-- 	<input type="button" onclick='saveSetting();' class='save_btn' value="Save"> -->
 </div>
 
 <!-- 탭 , 공유 우저 영역 -->
