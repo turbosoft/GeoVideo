@@ -14,10 +14,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class SerCheckVideoController {
 	@RequestMapping(value = "/geoSetChkVideo.do", method = RequestMethod.POST)
 	public void geoSetChkVideo(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		//setContentType À» ¸ÕÀú ¼³Á¤ÇÏ°í getWriter		
+		//setContentType Ã€Â» Â¸Ã•Ã€Ãº Â¼Â³ÃÂ¤Ã‡ÃÂ°Ã­ getWriter		
 		response.setContentType("text/html;charset=utf-8");
 		PrintWriter out = response.getWriter();
 		System.out.println("SetCheckVideoServlet");
 		out.print("SetCheckVideoServlet");
 	}
 }
+
