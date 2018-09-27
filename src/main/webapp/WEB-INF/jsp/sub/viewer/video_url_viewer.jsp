@@ -20,6 +20,9 @@ String user_id = request.getParameter("user_id");	//user id
 String file_url = request.getParameter("file_url");	//file url
 String projectUserId = request.getParameter("projectUserId");	//project User id
 String linkView = request.getParameter("link");	//project User id
+
+String linkType = request.getParameter("linkType");	//project User id
+String urlData = request.getParameter("urlData");	//url data
 %>
 
 <script type="text/javascript">
@@ -33,6 +36,10 @@ var idx = '<%= idx %>';
 var user_id = '<%= user_id %>';
 var request = null;		//request;
 var projectBoard = 0;	//GeoCMS 연동여부		0:연동안됨, 1:연동됨
+var linkType = '<%= linkType %>';			//link type
+var urlData = '<%= urlData %>';			//url data
+var copyUserId = '';
+var copyUrlIdx = 0;
 
 var file_url = '<%= file_url %>';
 var base_url = '';
@@ -50,7 +57,6 @@ var projectList = null;
 var nowViewList = new Array();				//현재 리스트
 var projectIdx = 0;
 var nowIndexType = 'GeoVideo';
-var imgEditMode = 0;						//편집모드 : 1, 아니면 0;
 var moveWidthNum = 135;						//imageWidth + margin + border
 var nowSelectIdx = 0;
 var dMarkerLat = 0;		//default marker latitude
@@ -60,6 +66,19 @@ var dMapZoom = 10;		//default map zoom
 $(function() {
 	callRequest();
 	
+	if(linkType != 'CP3'){
+		$('#image_view_group').parent().remove();
+		if(linkType == 'CP1'){
+			$('#ima_title').remove();
+			$('#video_map_area').remove();
+			$('#ioa_title').remove();
+			$('#video_object_area').remove();
+			$('#video_main_area').css('left','10px');
+			$('#copyUrlBtn').css('left','715px');
+			$('#copyUrlView').css('left','580px');
+			$('#buttonbar').css('left','30px');
+		}
+	}
 	$('#copyUrlBtn').hover(
 		function() {
 			$('#copyUrlView').css('display','block');
@@ -124,7 +143,6 @@ function httpRequest(textUrl){
 				base_url = 'http://'+ location.host + '/GeoCMS';
 				upload_url = '/GeoVideo/';
 				
-				btnViewCheck();
 				getVideoBase();
 				getServer("");
 			}else{
@@ -132,45 +150,13 @@ function httpRequest(textUrl){
 				upload_url = '/upload/';
 				$('body').append('<button class="video_write_button" style="position:absolute; left:10px; top:530px; width:300px; height:35px; display:block; cursor: pointer;" onclick="videoWrite();">Edit Annotaion</button>');
 				$('.viewerCloseBtn').css('display','block');
-				$('#iframeSrc').text("<iframe width='760' height='500' src='"+ videoOutUrl() +"/GeoVideo/geoVideo/video_viewer.do?file_url="+ file_url+ "' frameborder='0' allowfullscreen></iframe>");
+// 				$('#iframeSrc').text("<iframe width='760' height='500' src='"+ videoOutUrl() +"/GeoVideo/geoVideo/video_viewer.do?file_url="+ file_url+ "' frameborder='0' allowfullscreen></iframe>");
 			}
 			if(linkView == 'Y'){
 				$('#image_view_group').parent().remove();	
 				$('#viewerColstBtn').css('display','none');
 			}
 		}
-	}
-}
-
-function btnViewCheck(){
-	$('.video_write_button').remove();
-	$('.viewerCloseBtn').css('display','none');
-	$('#copyTypeEditor').remove();
-	
-	if(loginId != null && loginId != '' && loginId != 'null' && ((loginId == user_id && loginType != 'WRITE') || loginType == 'ADMIN')){
-		$('body').append('<button class="video_write_button" style="position:absolute; left:10px; top:530px; width:300px; height:35px; display:block; cursor: pointer;" onclick="videoWrite();">Edit Annotaion</button>');
-		$('.viewerCloseBtn').css('display','block');
-		$('#copyUrlView ul').append('<li id="copyTypeEditor" onclick="copyFn(\'CP4\');">Editor Url</li>');
-		$('#copyUrlView').css('height','90px');
-		$('#copyTypeEditor').hover(
-			function(t) {
-				$(this).css('font-weight','bold');
-			}, function(t) {
-				$(this).css('font-weight','normal');
-			}
-		);
-	}else if(editUserCheck() == 1 ||  (loginId != null && loginId != '' && loginId != 'null' && projectUserId == loginId)){
-		$('body').append('<button class="video_write_button" style="position:absolute; left:10px; top:530px; width:300px; height:35px; display:block; cursor: pointer;" onclick="videoWrite();">Edit Annotaion</button>');
-		$('.viewerCloseBtn').css('display','block');
-		$('#copyUrlView ul').append('<li id="copyTypeEditor" onclick="copyFn(\'CP4\');">Editor Url</li>');
-		$('#copyUrlView').css('height','90px');
-		$('#copyTypeEditor').hover(
-			function(t) {
-				$(this).css('font-weight','bold');
-			}, function(t) {
-				$(this).css('font-weight','normal');
-			}
-		);
 	}
 }
 
@@ -193,7 +179,9 @@ function getVideoBase() {
 					dMarkerLat = result[0].latitude;
 					dMarkerLng = result[0].longitude;
 					dMapZoom = result[0].mapzoom;
-					$('#googlemap').get(0).contentWindow.setDefaultData(dMarkerLat, dMarkerLng, dMapZoom);
+					if(linkType != 'CP1'){
+						$('#googlemap').get(0).contentWindow.setDefaultData(dMarkerLat, dMarkerLng, dMapZoom);
+					}
 				}
 			}else{
 				jAlert(data.Message, 'Info');
@@ -250,32 +238,8 @@ function getServer(tmpFileType){
 	});
 }
 
-//편집 가능 유저 확인
-function editUserCheck(){
-	var Url			= baseRoot() + "cms/getShareUser/";
-	var param		= loginToken + "/" + loginId + "/" + idx + "/GeoVideo";
-	var callBack	= "?callback=?";
-	editUserYN  = 0;
-	
-	$.ajax({
-		  type	: "get"
-		, url	: Url + param + callBack
-		, dataType	: "jsonp"
-		, async	: false
-		, cache	: false
-		, success: function(response) {
-			if(response.Code == 100 && response.Data[0].shareedit == 'Y'){
-				editUserYN = 1;
-			}
-		}
-	});
-	
-	return editUserYN;
-}
-
 function videoViewerInit() {
-// 	//비디오 설정
-	changeVideo();
+	getCopyUrlDecode();
 
 // 	//XML 데이터 설정
 	loadXML();
@@ -296,9 +260,11 @@ function changeVideo() {
 			$(this).remove();
 		}
 	});
+	if(linkType != null && (linkType == 'CP1'|| linkType == 'CP2' || linkType == 'CP3')){
+		idx = copyUrlIdx;
+	}
 	
 	getCopyUrl();
-	
 	if(projectBoard == 1){
 		if(loginToken == null || loginToken == '' || loginToken == 'null'){
 			loginToken = '&nbsp';
@@ -307,8 +273,8 @@ function changeVideo() {
 			loginId = '&nbsp';
 		}
 		
-		var Url			= baseRoot() + "cms/getContentChild/";
-		var param		= loginToken + "/" + loginId + "/" +idx;
+		var Url			= baseRoot() + "cms/getCopyDataUrl/";
+		var param		= "VIDEO/" + linkType + "/" + file_url + "/" +idx;
 		var callBack	= "?callback=?";
 
 		$.ajax({
@@ -350,33 +316,35 @@ function changeVideo() {
 							
 							if(k == 0){
 								file_url =  response[k].filename;
-								$('#iframeSrc').text("<iframe width='760' height='500' src='"+ videoOutUrl() +"/GeoVideo/geoVideo/video_viewer.do?file_url="+ file_url+ "&idx="+idx+"&link=Y' frameborder='0' allowfullscreen></iframe>");
+// 								$('#iframeSrc').text("<iframe width='760' height='500' src='"+ videoOutUrl() +"/GeoVideo/geoVideo/video_viewer.do?file_url="+ file_url+ "&idx="+idx+"&link=Y' frameborder='0' allowfullscreen></iframe>");
 								projectIdx = response[k].projectidx;
 							}
 						}
 						
 						
 						//좌표
-						var gpsDataStr = response[0].gpsdata;
-						if(gpsDataStr != null){
-							gpsDataStr = gpsDataStr.gpsData
-							loadGPSForData(gpsDataStr);
+						if(linkType != "CP1"){
+							var gpsDataStr = response[0].gpsdata;
+							if(gpsDataStr != null){
+								gpsDataStr = gpsDataStr.gpsData
+								loadGPSForData(gpsDataStr);
+							}
 						}
 						
 						if(video_child_len > 1){
 							if(video_child_len < 4){
 								var tmpHtmlStr = "<div style='width:380px; height:230px;'>No video</div>";
-								$('#video_player4').css('background','url("../images/geoImg/novideo.png")');
+								$('#video_player4').css('background','url("http://' +location.host +'/GeoVideo/images/geoImg/novideo.png")');
 								$('#video_player4').css('board','none');
 							}
 							if(video_child_len < 3){
 								var tmpHtmlStr = "<div style='width:380px; height:230px;'>No video</div>";
-								$('#video_player3').css('background','url("../images/geoImg/novideo.png")');
+								$('#video_player3').css('background','url("http://' +location.host +'/GeoVideo/images/geoImg/novideo.png")');
 								$('#video_player3').css('board','none');
 							}
 							if(video_child_len < 2){
 								var tmpHtmlStr = "<div style='width:380px; height:230px;'>No video</div>";
-								$('#video_player2').css('background','url("../images/geoImg/novideo.png")');
+								$('#video_player2').css('background','url("http://' +location.host +'/GeoVideo/images/geoImg/novideo.png")');
 								$('#video_player2').css('board','none');
 							}
 						}
@@ -392,8 +360,9 @@ function changeVideo() {
 						},500);
 						
 						//프로젝트 리스트 가져오기
-						getProjectGroupViewList();
-						addImageMoveList();
+						if(linkType == "CP3"){
+							addImageMoveList();
+						}
 					}
 				}else{
 					jAlert(data.Message, 'Info');
@@ -407,33 +376,6 @@ function changeVideo() {
 	}
 }
 
-//get projectList
-function getProjectGroupViewList(){
-	var tmpOIdx = '&nbsp';
-	var tmpSEdit = '&nbsp';
-	
-	var Url			= baseRoot() + "cms/getProjectList/";
-	var param		= loginToken + "/" + loginId +"/" +tmpOIdx + "/" +tmpSEdit;
-	var callBack	= "?callback=?";
-	
-	$.ajax({
-		type	: "get"
-		, url	: Url + param + callBack
-		, dataType	: "jsonp"
-		, async	: false
-		, cache	: false
-		, success: function(data) {
-			var response = data.Data;
-			if(data.Code == '100'){
-				projectList = response;
-			}
-// 			else if(data.Code != '203'){
-// 				jAlert(data.Message, 'Info');
-// 			}
-		}
-	});
-}
-
 function addImageMoveList(){
 	var tmpCnt = 0;
 	nowViewList = new Array();
@@ -444,8 +386,8 @@ function addImageMoveList(){
 	var pageNum = '&nbsp';
 	var contentNum = '&nbsp';
 	
-	var Url			= baseRoot() + "cms/getProjectContent/";
-	var param		= loginToken + "/" + loginId + "/list/" + projectIdx + "/" + pageNum + '/' + contentNum;
+	var Url			= baseRoot() + "cms/getCopyDataUrl/";
+	var param		= "PROJECT/" + linkType + "/" + file_url + "/" + projectIdx;
 	var callBack	= "?callback=?";
 	
 	$.ajax({
@@ -611,63 +553,8 @@ function imgDataSetting(obj){
 	tmpGroupHTML += '<div class="m_l_15" style="float:left; margin: 12px 0 0 10px; font-size:10px; color:#00b8b0;">'+ proShare +'</div>';
 	tmpLeft1 = '10px';
 	tmpGroupHTML += "<div class='titleLabel' style='float:left; margin: 8px 0 0 "+ tmpLeft1 +";' title='"+ tmpGroup +"'>"+ projectNameTxt +"</div>";
-
-	tmpGroupHTML += "<img src='<c:url value='/images/geoImg/viewer/setting_btn_pop.png'/>' style='float:right; margin:8px 10px 0 20px; width:30px; height:26px; display: none; cursor:pointer;' id='mv_setting' onclick='imageControllView(\"Y\")'>";
-	
-	tmpGroupHTML += "<img src='<c:url value='/images/geoImg/viewer/close_btn_pop.png'/>' style='float:right; margin:8px 10px 0 20px; width:30px; height:26px; display: none; cursor:pointer;' class='mv_setting_on' onclick='imageControllView(\"N\")'>";
-	tmpGroupHTML += "<img src='<c:url value='/images/geoImg/viewer/picdel_btn_viewer.png'/>' style='float:right; margin:8px 0 0 20px; width:47px; height:27px; display: none; cursor:pointer;' class='mv_setting_on' onclick='removeMoveList()'>";
-	tmpGroupHTML += "<img src='<c:url value='/images/geoImg/viewer/picmove_btn_viewer.png'/>' style='float:right; margin:8px 0 0 20px; width:47px; height:27px; display: none; cursor:pointer;' id='view_category' class='mv_setting_on' onclick='getMoveList()'>";
 	
 	$('#image_view_group').append(tmpGroupHTML);
-
-	if(imgEditMode == 1){
-		$('.mv_setting_on').css('display','block');
-		$('#moveSelectDiv').empty();
-	}
-	
-	if(loginId != null && loginId != '' && ((loginId == user_id && loginType != 'WRITE') || loginType == 'ADMIN' || (user_id == null || user_id == '' || user_id == 'null'))){
-		$('.edit_btn_bottom').css('display', 'block');
-		if(imgEditMode != 1){
-			$('#mv_setting').css('display', 'block');
-		}
-	}else if(editUserCheck() == 1 ||  projectUserId == loginId){
-		$('.edit_btn_bottom').css('display', 'block');
-		if(imgEditMode != 1 && projectUserId == loginId){
-			$('#mv_setting').css('display', 'block');
-		}
-	}else{
-		$('.edit_btn_bottom').css('display', 'none');
-		$('#mv_setting').css('display', 'none');
-	}
-}
-
-//img modify mode
-function imageControllView(type){
-	$('.checkAreaClass').remove();
-	$('#copyUrlView').maxZIndex({inc:1});
-	
-	if(type == 'Y'){
-		imgEditMode = 1;
-		addImageMoveList();
-		
-		$('#mv_setting').css('display','none');
-		$('.mv_setting_on').css('display','block');
-
-		var tmpDiv = '<div id="grayDivArea" style="position:absolute; width:100%; height:576px; background:gray; opacity:0.5; left:0; top:0;" ></div>';
-		$('body').append(tmpDiv);
-		
-		$('#image_view_group').maxZIndex({inc:1});
-		$('#img_move_area').maxZIndex({inc:1});
-		$('#moveSelectDiv').maxZIndex({inc:1});
-		
-	}else{
-		imgEditMode = 0;
-		addImageMoveList();
-		$('.mv_setting_on').css('display','none');
-		$('#grayDivArea').remove();
-		$('#moveSelectDiv').empty();
-		$('#moveSelectDiv').css('display','none');
-	}
 }
 
 var editContentArr = new Array();	//이동할 컨텐츠
@@ -686,31 +573,12 @@ function imgMapCenterChange(tmpArr){
 		}
 	});
 	
-	if(imgEditMode == 1){
-		if(!(loginId != null && loginId != '' && (((loginId == tmpId && loginType != 'WRITE') || loginType == 'ADMIN' || (tmpId == null || tmpId == '' || tmpId == 'null')) || (editUserCheck() == 1 ||  tmpProjectId == loginId)))){
-			return;
-		}
-
-		var tmp1 = $.inArray(tmpKind+"_"+nowSelectIdx, editContentArr);
-		if(tmp1 > -1 ){
-			editContentArr.splice(tmp1,1);
-			$('#checkArea_'+tmpKind+"_"+nowSelectIdx).remove();
-		}else{
-			var tmpLeft = tmpMoveIdx*moveWidthNum;
-			editContentArr.push(tmpKind+"_"+nowSelectIdx);
-			var tmpDiv = '<div id="checkArea_'+ tmpKind+"_"+nowSelectIdx +'" class="checkAreaClass" style="position:absolute; width:112px; height:112px; background-image: url(../images/geoImg/viewer/select_photo_btn_pop.png); background-repeat:no-repeat;cursor:pointer; top:10px; left:'+ tmpLeft +'px;" ></div>';
-			$('#Pro_'+ tmpKind +'_'+nowSelectIdx).append(tmpDiv);
-		}
-		return;
-	}
-	
 	if(tmpKind != null && tmpKind == 'GeoPhoto'){
 		videoViewClose();
 		window.parent.imageViewer(tpAr[2], tmpId, nowSelectIdx, tmpProjectId)
 		return;
 	}else{
 		idx = nowSelectIdx;
-		btnViewCheck();
 		videoViewerInit();
 		return;
 	}
@@ -751,254 +619,6 @@ function imgMapCenterChange(tmpArr){
 	$('#Pro_'+ tmpKind +'_'+ idx + " DIV").css('border', '2px solid #00b8b0');
 }
 
-function getMoveList(){
-	var moveUrl = '';
-	moveUrl = 'cms/getProjectList/'+ loginToken +'/'+ loginId +'/&nbsp/Y';
-	
-	if($('#moveSelectDiv').css('display') == 'none'){
-		var Url			= baseRoot() + moveUrl;
-		var callBack	= "?callback=?";
-		
-		$.ajax({
-			  type	: "get"
-			, url	: Url + callBack
-			, dataType	: "jsonp"
-			, async	: false
-			, cache	: false
-			, success: function(response) {
-				if(response.Code == 100){
-					var result = response.Data; 
-					if(result != null && result.length>1){
-						var tmpHtml = '';
-						
-						for(var i=0; i<result.length; i++){
-							var tmpTabName = result[i].projectname;
-							var proShare = '';
-							if(result[i].sharetype == '1'){
-// 								proShare = '공개';
-								proShare = 'FULL';
-							}else if(result[i].sharetype == '0'){
-// 								proShare = '비공개';
-								proShare = 'NON';
-							}else{
-// 								proShare = '선택공개';
-								proShare = 'SELECTIVE';
-							}
-							
-							if(result[i].idx != projectIdx){
-								var tmpTabNameShot = tmpTabName.length>10? tmpTabName.substring(0,10)+'...' : tmpTabName;
-								
-								tmpHtml += '<div style="height:26px; background:#4f3639; cursor:pointer;" onclick="modifyCategory('+ result[i].idx +');" class="proNameMouseDiv">';
-								tmpHtml += "<div class='m_l_15' style='float:left; margin: 6px 0 0 10px; font-size:10px; color:#00b8b0;'>"+ proShare +"</div>";
-								tmpHtml += "<div style='padding: 5px 0 0 60px; font-size:12px;' title='"+ tmpTabName +"'>"+ tmpTabNameShot +"</div></div>";
-							}
-						}
-						
-						$('#moveSelectDiv').append(tmpHtml);
-						$('.proNameMouseDiv').hover(
-							function() {
-								$(this).css('background','#25323c');
-							}, function() {
-								$(this).css('background','#4f3639');
-							}
-						);
-						
-						var  tmpLeft2 = $('#view_category').offset().left -33;
-						$('#moveSelectDiv').css('display','block');
-						$('#moveSelectDiv').css('left',tmpLeft2);
-						var tmpToh2 = $('#view_category').offset().top - $('#moveSelectDiv').height()-7;
-						$('#moveSelectDiv').css('top',tmpToh2);
-					}else{
-// 						jAlert('이동할 프로젝트 정보가 없습니다', '정보');
-						jAlert('No project information to move.', 'Info');
-					}
-				}else if(response.Code == 200){
-// 					jAlert('이동할 프로젝트 정보가 없습니다', '정보');
-					jAlert('No project information to move.', 'Info');
-				}
-			}
-		});
-	}else{
-		$('#moveSelectDiv').empty();
-		$('#moveSelectDiv').css('display','none');
-	}
-}
-
-//move Content
-function modifyCategory(tmpProIdx){
-	if(editContentArr == null || editContentArr.length <= 0){
-// 		jAlert('이동할 컨텐츠를 선택해 주세요', '정보');
-		jAlert('Please select content to move.', 'Info');
-		$('#popup_container').maxZIndex({inc:1});
-		return;
-	}
-	
-	$('#moveSelectDiv').css('display','none');
-	
-	var moveUrl = moveUrl = 'cms/moveProject/'+ loginToken +'/'+ loginId +'/'+ tmpProIdx + "/" + editContentArr;
-	
-	var Url			= baseRoot() + moveUrl;
-	var callBack	= "?callback=?";
-	
-	$.ajax({
-		  type	: "POST"
-		, url	: Url + callBack
-		, dataType	: "jsonp"
-		, async	: false
-		, cache	: false
-		, success: function(response) {
-			if(response.Code == 100){
-				makeViewOrd();
-			}
-		}
-	});
-}
-
-function removeMoveList(){
-	if(editContentArr == null || editContentArr.length <= 0){
-// 		jAlert('삭제할 사진을 선택해 주세요', '정보');
-		jAlert('Please select a photo to delete.', 'Info');
-		$('#popup_container').maxZIndex({inc:1});
-		return;
-	}
-	
-// 	jConfirm('정말 삭제하시겠습니까?', '정보', function(type){
-	jConfirm('Are you sure you want to delete?', 'Info', function(type){
-		if(type){
-			var rmPhotoList = new Array();
-			var rmVideoList = new Array();
-			$.each(editContentArr, function(eIdx, eVal){
-				if(eVal != null && eVal != '' && eVal != undefined){
-					var tmpEval = eVal.split('_');
-					if(tmpEval[0] == 'GeoPhoto'){
-						rmPhotoList.push(tmpEval[1]);
-					}else if(tmpEval[0] == 'GeoVideo'){
-						rmVideoList.push(tmpEval[1]);
-					}
-				}
-			});
-			if(rmPhotoList != null && rmPhotoList.length > 0){
-				var moveUrl = 'cms/deleteContent/'+ loginToken +'/'+ loginId +'/GeoPhoto/' + rmPhotoList;
-				var Url			= baseRoot() + moveUrl;
-				var callBack	= "?callback=?";
-				
-				$.ajax({
-					  type	: "POST"
-					, url	: Url + callBack
-					, dataType	: "jsonp"
-					, async	: false
-					, cache	: false
-					, success: function(response) {
-						if(response.Code == 100){
-							if(rmVideoList != null && rmVideoList.length > 0){
-								var moveUrl = 'cms/deleteContent/'+ loginToken +'/'+ loginId +'/GeoVideo/' + rmVideoList;
-								var Url			= baseRoot() + moveUrl;
-								var callBack	= "?callback=?";
-								
-								$.ajax({
-									  type	: "POST"
-									, url	: Url + callBack
-									, dataType	: "jsonp"
-									, async	: false
-									, cache	: false
-									, success: function(response) {
-										if(response.Code == 100){
-											makeViewOrd();
-										}
-									}
-								});
-							}else{
-								makeViewOrd();
-							}
-						}
-					}
-				});
-			}else if(rmVideoList != null && rmVideoList.length > 0){
-				var moveUrl = 'cms/deleteContent/'+ loginToken +'/'+ loginId +'/GeoVideo/' + rmVideoList;
-				var Url			= baseRoot() + moveUrl;
-				var callBack	= "?callback=?";
-				
-				$.ajax({
-					  type	: "POST"
-					, url	: Url + callBack
-					, dataType	: "jsonp"
-					, async	: false
-					, cache	: false
-					, success: function(response) {
-						if(response.Code == 100){
-							makeViewOrd();
-						}
-					}
-				});
-				
-			}
-		}
-	});
-}
-
-function makeViewOrd(){
-	var chkData = true;
-	if(nowViewList.length != editContentArr.length){
-		for(var i=0;i<nowViewList.length;i++){
-			if(nowViewList[i] != null){
-				chkData = true;
-				for(var j=0;j<editContentArr.length;j++){
-					if(nowViewList[i].datakind+"_"+nowViewList[i].idx == editContentArr[j]){
-						chkData = false;
-					}
-				}
-				if(chkData){
-					nowIndexType = nowViewList[i].datakind;
-					idx = nowViewList[i].idx;
-					break;
-				}
-			}
-		}
-	}
-
-	if(nowViewList.length == editContentArr.length){
-		window.parent.viewMyProjects(null);
-		
-// 		jAlert('불러올 컨텐츠가 없습니다.', '정보', function(res){
-		jAlert('There is no content to import.', 'Info', function(res){
-			videoViewClose();
-		});
-	}
-	
-	addImageMoveList();
-	
-	imgEditMode = 0;
-	$('.checkAreaClass').remove();
-	$('#grayDivArea').remove();
-	
-	$.each(nowViewList, function(idx1, val1){
-		if(val1.idx == idx && val1.datakind == nowIndexType){
-			var tempArr = new Array; //mapCenterChange에 넘길 객체 생성
-			tempArr.push(val1.latitude);
-			tempArr.push(val1.longitude);
-			tempArr.push(val1.filename);
-			tempArr.push(val1.idx);
-			tempArr.push(val1.datakind);
-			tempArr.push(val1.originname);
-			tempArr.push(val1.thumbnail);
-			tempArr.push(val1.id);
-			tempArr.push(val1.projectuserid);
-			if(val1.projectmarkericon != null){
-				val1.projectmarkericon = val1.projectmarkericon.replace('_','&ubsp');
-			}
-			tempArr.push(val1.projectmarkericon);
-			tempArr.push(val1.u_date);
-			tempArr.push(val1.projectidx);
-			tempArr.push(val1.dronetype);
-			imgMapCenterChange("'"+ tempArr +"'");
-		}
-	});
-	
-	imageControllView('Y');
-	
-	window.parent.viewMyProjects(null);
-}
-
 var moveNum = 0;
 var maxMoveNum = 0;
 var totalMoveWidth = 0;
@@ -1019,53 +639,6 @@ function moveImgList(text){
 	}
 	$('#img_move_list').animate({scrollLeft : tmpLeft1});
 	
-}
-
-//큰 이미지 좌우 이동
-function changeImg(text){
-	var tmpMoveIdx = 0;
-	var nextIdx = 0;
-	var tmpKind = 'GeoPhto';
-	$.each(nowViewList, function(idx1, val1){
-		if(val1.idx == idx){
-			tmpMoveIdx = idx1;
-			tmpKind = val1.datakind;
-		}
-	});
-	
-	if(text == "l"){
-		if(tmpMoveIdx == 1){
-			$('#bigImgMoveL').css('display','none');
-		}
-		if(tmpMoveIdx == nowViewList.length-1){
-			$('#bigImgMoveR').css('display','block');
-		}
-		nextIdx = tmpMoveIdx - 1;
-	}else if(text == "r"){
-		if(tmpMoveIdx == nowViewList.length-2){
-			$('#bigImgMoveR').css('display','none');
-		}
-		if(tmpMoveIdx == 0){
-			$('#bigImgMoveL').css('display','block');
-		}
-		nextIdx = tmpMoveIdx + 1;
-	}
-	
-	if(nowViewList.length > 8){
-		var tmpMoveLeft1 = 0;
-		if(nextIdx > 4){
-			tmpMoveLeft1 = (moveWidthNum * (nextIdx-3));
-		}
-		$('#img_move_list').animate({scrollLeft : tmpMoveLeft1});
-	}
-
-	imgDataSetting(nowViewList[nextIdx]);
-	file_url = nowViewList[nextIdx].filename;
-	changeImageNomal();
-	
-	$('#Pro_'+ tmpKind +'_'+ idx + " DIV").css('border', '2px solid #888888');
-	idx = nowViewList[nextIdx].idx;
-	$('#Pro_'+ tmpKind +'_'+ idx + " DIV").css('border', '2px solid #00b8b0');
 }
 
 function videoViewClose(){
@@ -1581,7 +1154,9 @@ function timeUpdate(time, totaltime) {
 	var point = time * 5;
 	$('#video_guide').css({left:point});
 	visibleFrameObj(point);
-	moveMap(time, totaltime);
+	if(linkType != 'CP1'){
+		moveMap(time, totaltime);
+	}
 }
 
 function visibleFrameObj(point) {
@@ -1626,13 +1201,13 @@ css3color = function(color, opacity) {
 };
 
 //소스보기
-function iframeSrcView(){
-	if($('#iframeSrc').css('display') == 'none'){
-		$('#iframeSrc').css('display','block');
-	}else{
-		$('#iframeSrc').css('display','none');
-	}
-}
+// function iframeSrcView(){
+// 	if($('#iframeSrc').css('display') == 'none'){
+// 		$('#iframeSrc').css('display','block');
+// 	}else{
+// 		$('#iframeSrc').css('display','none');
+// 	}
+// }
 
 /* video button start ----------------------------------- 비디오 버튼 설정 ------------------------------------- */
 
@@ -1835,12 +1410,42 @@ function vidplay() {
  }
  
 //copy Url
+ function getCopyUrlDecode(){
+ 	var Url			= baseRoot() + "cms/encrypt";
+ 	var param		= "/" + urlData + "/decrypt";
+ 	var callBack	= "?callback=?";
+ 	
+ 	$.ajax({
+ 		type	: "get"
+ 		, url	: Url + param + callBack
+ 		, dataType	: "jsonp"
+ 		, async	: false
+ 		, cache	: false
+ 		, success: function(data) {
+ 			if(data.returnStr != null && data.returnStr != ''){
+ 				var  tmpStr = data.returnStr;
+ 				tmpStr = tmpStr.split("&");
+ 				$.each(tmpStr, function(idx, val){
+ 					if(val.indexOf('file_url') > -1){
+ 						file_url = val.split('=')[1];
+ 					}else if(val.indexOf('loginId') > -1){
+ 						copyUserId = val.split('=')[1];
+ 					}else if(val.indexOf('idx') > -1){
+ 						copyUrlIdx = val.split('=')[1];
+ 					}
+ 				});
+ 			}else{
+ 				jAlert(data.Message, 'Info');
+ 			}
+ 		}
+ 	});
+ 	//비디오 설정
+	changeVideo();
+ }
+ 
  function copyFn(CopyType){
  	var copyUrlData = $('#copyUrlText').val();
  	var copyUrlStr = 'http://'+location.host + '/GeoVideo/geoVideo/video_url_viewer.do?urlData='+ copyUrlData +'&linkType='+CopyType;
- 	if(CopyType == "CP4"){
- 		copyUrlStr = 'http://'+location.host + '/GeoVideo/geoVideo/video_write_page.do?urlData='+ copyUrlData +'&linkType='+CopyType;
- 	}
  	$('#copyUrlAll').val(copyUrlStr);
  	$("#copyUrlAll").select();
  	document.execCommand('copy');
@@ -1851,6 +1456,7 @@ function vidplay() {
  function getCopyUrl(){
  	$('#copyUrlText').val('');
  	var encrypText = 'file_url='+ file_url +'&loginId='+ loginId +'&idx='+ idx;
+ 	
  	var Url			= baseRoot() + "cms/encrypt";
  	var param		= "/" + encrypText + "/encrypt";
  	var callBack	= "?callback=?";
@@ -1924,9 +1530,9 @@ function vidplay() {
     <button onclick="mute();" style="margin-left: 10px;">Mute</button> 
 </div> 
 
-<button  onclick='iframeSrcView();' style='position:absolute; left:340px; top:545px;'>Source Code</button>
-<textarea id="iframeSrc" style='position:absolute; left:340px; top:565px; width:660px; height:35px; overflow-x:hidden; line-height: 17px; font-size:12px; display:none;' readonly="readonly">
-</textarea>
+<!-- <button  onclick='iframeSrcView();' style='position:absolute; left:340px; top:545px;'>Source Code</button> -->
+<!-- <textarea id="iframeSrc" style='position:absolute; left:340px; top:565px; width:660px; height:35px; overflow-x:hidden; line-height: 17px; font-size:12px; display:none;' readonly="readonly"> -->
+<!-- </textarea> -->
 
 <div id="video_obj_area" style="display:none;"></div>
 
@@ -1968,7 +1574,7 @@ function vidplay() {
 <!-- <div style="width:1104px; height: 30px; position: absolute;top:0;left:0;"> -->
 	<div id="copyUrlBtn" style="width: 70px;height: 20px;background-color: #25323c;border-radius:5px;text-align: center;position: absolute;top: 545px;left: 1025px;cursor: pointer;color: #ffffff;">copy URI</div>
 <!-- </div> -->
-<div id="copyUrlView" class="contextMenu" style="display: none; position: absolute; width: 205px; height: 80px; background-color: rgb(228, 228, 228); left: 890px; top: 565px; border-radius: 5px; cursor: pointer;z-index:999;">
+<div id="copyUrlView" class="contextMenu" style="display: none; position: absolute; width: 205px; height: 80px; background-color: rgb(228, 228, 228); left: 890px; top: 565px; border-radius: 5px; cursor: pointer;">
 	<ul style="margin-left: -10px;">
 		<li id="copyTypePhoto" onclick="copyFn('CP1');" class="copyUrlViewLi">Photo URI</li>
 		<li id="copyTypeMap" onclick="copyFn('CP2');" class="copyUrlViewLi">Photo + Map URI</li>
@@ -1980,6 +1586,8 @@ function vidplay() {
 
 <!----------------------------------------------------- 메인 영역 끝 ----------------------------------------------- -->
 
+<!-- 저작 버튼 -->
+<!-- 	<button style="position:absolute; left:580px; top:780px; width:140px; height:35px; display:none; cursor: pointer;" onclick="videoViewClose();" class="viewerCloseBtn">Close</button> -->
 </body>
 
 </html>
