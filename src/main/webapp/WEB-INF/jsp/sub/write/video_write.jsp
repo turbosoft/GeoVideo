@@ -14,6 +14,9 @@ String loginToken = request.getParameter("loginToken");
 String loginId = request.getParameter("loginId");
 String projectBoard = request.getParameter("projectBoard");
 String editUserYN = request.getParameter("editUserYN");
+
+String linkType = request.getParameter("linkType");	//project User id
+String urlData = request.getParameter("urlData");	//url data
 %>
 <script type="text/javascript">
 
@@ -23,6 +26,11 @@ var loginToken = '<%= loginToken %>';
 var loginId = '<%= loginId %>';
 var projectBoard = '<%= projectBoard %>';
 var editUserYN = '<%= editUserYN %>';
+
+var linkType = '<%= linkType %>';			//link type
+var urlData = '<%= urlData %>';			//url data
+var copyUserId = '';
+var copyUrlIdx = 0;
 
 // var nowSelTab;
 var nowShareType;
@@ -45,6 +53,10 @@ var dMarkerLng = 0;		//default marker longitude
 var dMapZoom = 10;		//default map zoom
 
 $(function() {
+	if(urlData != null && urlData != '' && linkType != null && linkType == 'CP4'){
+		getCopyUrlDecode();
+	}
+	
 	$('.menuIcon img').hover(function(){
 		$(this).parent().css('border-left','1px solid #6d808f');
 		$(this).parent().css('border-top','1px solid #6d808f');
@@ -52,31 +64,6 @@ $(function() {
 		$('.menuIcon').css('border','none');
 	});
 	
-	if(projectBoard == 1){
-		base_url = 'http://'+ location.host + '/GeoCMS';
-		upload_url = '/GeoVideo/';
-		if(editUserYN != 1){
-			//ui 
-			$('#showInfoDiv').css('display','block');
-			$('.menuIcon').css('width','14%');
-			$('.menuIconData').css('display', 'block');
-		}
-		
-		getOneVideoData();
-		getVideoBase();
-		getServer("");
-	}else{
-		base_url = '<c:url value="/"/>';
-		upload_url = '/upload/';
-
-		$('.menuIcon').each(function(idx, val){
-			if(idx != 0){
-				var tmpNum = 150*idx;
-				$(this).css('left', tmpNum+'px');
-			}
-		});
-	}
-
 	//프레임 라인 설정
 	$('.frame_plus').button({ icons: { primary: 'ui-icon-plusthick'}, text: false });
 	$('.frame_minus').button({ icons: { primary: 'ui-icon-minusthick'}, text: false });
@@ -95,9 +82,20 @@ $(function() {
 });
 
 function getOneVideoData(){
-	var Url			= baseRoot() + "cms/getVideo/";
-	var param		= "one/" + loginToken + "/" + loginId + "/&nbsp/&nbsp/&nbsp/" +idx;
-	var callBack	= "?callback=?";
+	var Url = '';
+	var param = '';
+	var callBack = '';
+	if(urlData != null && urlData != '' && linkType != null && linkType == 'CP4'){
+		idx = copyUrlIdx;
+		loginId = copyUserId;
+		Url			= baseRoot() + "cms/getCopyDataUrl/";
+		param		= "VIDEOONE/" + linkType + "/" + file_url + "/" +idx;
+		callBack	= "?callback=?";
+	}else{
+		Url			= baseRoot() + "cms/getVideo/";
+		param		= "one/" + loginToken + "/" + loginId + "/&nbsp/&nbsp/&nbsp/" +idx;
+		callBack	= "?callback=?";
+	}
 	
 	$.ajax({
 		type	: "get"
@@ -231,6 +229,31 @@ function videoGetShareUser(){
 
 /* init_start ----- 비디오 소스 설정 ------------------------------------- */
 function videoWriteInit() {
+	if(projectBoard == 1){
+		base_url = 'http://'+ location.host + '/GeoCMS';
+		upload_url = '/GeoVideo/';
+		if(editUserYN != 1){
+			//ui 
+			$('#showInfoDiv').css('display','block');
+			$('.menuIcon').css('width','14%');
+			$('.menuIconData').css('display', 'block');
+		}
+		
+		getOneVideoData();
+		getVideoBase();
+		getServer("");
+	}else{
+		base_url = '<c:url value="/"/>';
+		upload_url = '/upload/';
+
+		$('.menuIcon').each(function(idx, val){
+			if(idx != 0){
+				var tmpNum = 150*idx;
+				$(this).css('left', tmpNum+'px');
+			}
+		});
+	}
+	
 	//비디오 설정
 	changeVideo();
 	//프레임 설정
@@ -244,9 +267,18 @@ function videoWriteInit() {
 
 function changeVideo() {
 	if(projectBoard == 1){
-		var Url			= baseRoot() + "cms/getContentChild/";
-		var param		= loginToken + "/" + loginId + "/" +idx;
-		var callBack	= "?callback=?";
+		var Url = '';
+		var param = '';
+		var callBack = '';
+		if(urlData != null && urlData != '' && linkType != null && linkType == 'CP4'){
+			Url			= baseRoot() + "cms/getCopyDataUrl/";
+			param		= "VIDEO/" + linkType + "/" + file_url + "/" +idx;
+			callBack	= "?callback=?";
+		}else{
+			Url			= baseRoot() + "cms/getContentChild/";
+		 	param		= loginToken + "/" + loginId + "/" +idx;
+		 	callBack	= "?callback=?";
+		}
 		
 		$.ajax({
 			type	: "get"
@@ -1305,8 +1337,14 @@ function saveVideoWrite(type, tmpServerId, tmpServerPass, tmpServerPort) {
 						tmpTitle = dataReplaceFun(tmpTitle);
 						tmpContent = dataReplaceFun(tmpContent);
 						
+						var coplyUrlSave = '&nbsp';
+						if(urlData != null && urlData != '' && linkType != null && linkType == 'CP4'){
+							coplyUrlSave = 'Y';
+						}
+						
 						var Url			= baseRoot() + "cms/updateVideo/";
-						var param		= loginToken + "/" + loginId + "/" + idx + "/" + tmpTitle + "/" + tmpContent + "/" + tmpShareType + "/" + tmpAddShareUser + "/" + tmpRemoveShareUser + "/" + tmp_xml_text +"/" + tmpEditYes + "/" + tmpEditNo;
+						var param		= loginToken + "/" + loginId + "/" + idx + "/" + tmpTitle + "/" + tmpContent + "/" + tmpShareType + "/" + 
+							tmpAddShareUser + "/" + tmpRemoveShareUser + "/" + tmp_xml_text +"/" + tmpEditYes + "/" + tmpEditNo +"/"+ coplyUrlSave;
 						var callBack	= "?callback=?";
 						$.ajax({
 							type	: "POST"
@@ -1926,6 +1964,39 @@ function vidplay() {
 	     seekBar.value = (100 / mainVideo.duration) * mainVideo.currentTime;
 	     timeUpdate(parseInt(this.currentTime), parseInt(this.duration));
 	 });
+ }
+ 
+//copy Url
+ function getCopyUrlDecode(){
+ 	var Url			= baseRoot() + "cms/encrypt";
+ 	var param		= "/" + urlData + "/decrypt";
+ 	var callBack	= "?callback=?";
+ 	
+ 	$.ajax({
+ 		type	: "get"
+ 		, url	: Url + param + callBack
+ 		, dataType	: "jsonp"
+ 		, async	: false
+ 		, cache	: false
+ 		, success: function(data) {
+ 			if(data.returnStr != null && data.returnStr != ''){
+ 				var  tmpStr = data.returnStr;
+ 				tmpStr = tmpStr.split("&");
+ 				$.each(tmpStr, function(idx, val){
+ 					if(val.indexOf('file_url') > -1){
+ 						file_url = val.split('=')[1];
+ 					}else if(val.indexOf('loginId') > -1){
+ 						copyUserId = val.split('=')[1];
+ 					}else if(val.indexOf('idx') > -1){
+ 						copyUrlIdx = val.split('=')[1];
+ 					}
+ 				});
+ 				projectBoard = 1;
+ 			}else{
+ 				jAlert(data.Message, 'Info');
+ 			}
+ 		}
+ 	});
  }
 </script>
 </head>
