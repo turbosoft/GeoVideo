@@ -1576,9 +1576,9 @@ function vidplay() {
 <!-- </div> -->
 <div id="copyUrlView" class="contextMenu" style="display: none; position: absolute; width: 205px; height: 80px; background-color: rgb(228, 228, 228); left: 890px; top: 565px; border-radius: 5px; cursor: pointer;">
 	<ul style="margin-left: -10px;">
-		<li id="copyTypePhoto" onclick="copyFn('CP1');" class="copyUrlViewLi">Photo URI</li>
-		<li id="copyTypeMap" onclick="copyFn('CP2');" class="copyUrlViewLi">Photo + Map URI</li>
-		<li id="copyTypeProject" onclick="copyFn('CP3');" class="copyUrlViewLi">Photo + Map + Layer URI</li>
+		<li id="copyTypePhoto" onclick="copyFn('CP1');" class="copyUrlViewLi">Video URI</li>
+		<li id="copyTypeMap" onclick="copyFn('CP2');" class="copyUrlViewLi">Video + Map URI</li>
+		<li id="copyTypeProject" onclick="copyFn('CP3');" class="copyUrlViewLi">Video + Map + Layer URI</li>
 	</ul>
 </div>
 <input type="hidden" id="copyUrlText">
