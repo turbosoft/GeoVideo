@@ -349,8 +349,10 @@ function changeVideo() {
 // 							video.load();
 							
 							if(k == 0){
+								var copyUrlData = $('#copyUrlText').val();
 								file_url =  response[k].filename;
-								$('#iframeSrc').text("<iframe width='760' height='500' src='"+ videoOutUrl() +"/GeoVideo/geoVideo/video_viewer.do?file_url="+ file_url+ "&idx="+idx+"&link=Y' frameborder='0' allowfullscreen></iframe>");
+// 								$('#iframeSrc').text("<iframe width='760' height='500' src='"+ videoOutUrl() +"/GeoVideo/geoVideo/video_viewer.do?file_url="+ file_url+ "&idx="+idx+"&link=Y' frameborder='0' allowfullscreen></iframe>");
+								$('#iframeSrc').text("<iframe width='760' height='500' src='"+ videoOutUrl() +"/GeoVideo/geoVideo/video_url_viewer.do?urlData="+ copyUrlData +"&linkType=CP1' frameborder='0' allowfullscreen></iframe>");
 								projectIdx = response[k].projectidx;
 							}
 						}
@@ -1629,6 +1631,7 @@ css3color = function(color, opacity) {
 function iframeSrcView(){
 	if($('#iframeSrc').css('display') == 'none'){
 		$('#iframeSrc').css('display','block');
+		$('#iframeSrc').maxZIndex({inc:1});
 	}else{
 		$('#iframeSrc').css('display','none');
 	}
