@@ -111,7 +111,6 @@ function getOneVideoData(){
 				if(response != null && response != ''){
 					response = response[0];
 					nowShareType = response.sharetype;
-					
 					$('#title_area').val(response.title);
 					$('#content_area').val(response.content);
 // 					var nowShareTypeText = nowShareType == 0? '비공개':nowShareType== 1? '전체공개':'특정인 공개';
