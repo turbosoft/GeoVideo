@@ -25,4 +25,5 @@
     <mvc:view-controller path="/geoVideo/video_write_page.do" view-name="video_write_page"/>
     <mvc:view-controller path="/geoVideo/xml_view.do" view-name="sub/write/xml_view"/>
     <mvc:view-controller path="/geoVideo/video_googlemap.do" view-name="sub/maps/video_googlemap"/>
+    <mvc:view-controller path="/geoVideo/video_url_viewer.do" view-name="sub/viewer/video_url_viewer"/>
 </beans>
