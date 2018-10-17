@@ -111,6 +111,10 @@ function getOneVideoData(){
 				if(response != null && response != ''){
 					response = response[0];
 					nowShareType = response.sharetype;
+					
+					if(response.dronetype == 'Y'){
+						$('#droneTypeChk').attr('checked',true);
+					}
 					$('#title_area').val(response.title);
 					$('#content_area').val(response.content);
 // 					var nowShareTypeText = nowShareType == 0? '비공개':nowShareType== 1? '전체공개':'특정인 공개';
@@ -924,7 +928,7 @@ function createIcon(img_src) {
 
 function inputGeometry() {
 	compHide();
-	$('#geometry_line_color').attr('disabled', true); $('#geometry_bg_color').attr('disabled', true); $('#geometry_line_color').val('#999999'); $('#geometry_line_color').css('background-color', '#999999'); $('#geometry_bg_color').val('#FF0000'); $('#geometry_bg_color').css('background-color', '#FF0000');
+	$('#geometry_line_color').attr('disabled', true); $('#geometry_bg_color').attr('disabled', true); $('#geometry_line_color').val('#FF0000'); $('#geometry_line_color').css('background-color', '#FF0000'); $('#geometry_bg_color').val('#FF0000'); $('#geometry_bg_color').css('background-color', '#FF0000');
 	document.getElementById('geometry_dialog').style.display='block';
 }
 
@@ -969,6 +973,7 @@ function inputGeometryShape(type) {
 			//좌표점 계산
 			var left_str = $('#video_main_area').css('left'); var top_str = $('#video_main_area').css('top'); var left = parseInt(left_str.replace('px','')); var top = parseInt(top_str.replace('px',''));
 			geometry_point_arr_1.push(e.pageX - (this.offsetLeft + left)); geometry_point_arr_2.push(e.pageY - (this.offsetTop + top));
+			createGeometry(type);
 		});
 		canvas_element.mousemove(function(e) {
 			if(geometry_click_move_val) {
@@ -1006,6 +1011,7 @@ function inputGeometryShape(type) {
 			//좌표점 계산
 			var left_str = $('#video_main_area').css('left'); var top_str = $('#video_main_area').css('top'); var left = parseInt(left_str.replace('px','')); var top = parseInt(top_str.replace('px',''));
 			geometry_point_arr_1.push(e.pageX - (this.offsetLeft + left)); geometry_point_arr_2.push(e.pageY - (this.offsetTop + top));
+			createGeometry(type);
 		});
 		canvas_element.mousemove(function(e) {
 			if(geometry_click_move_val) {
@@ -1033,27 +1039,40 @@ function inputGeometryShape(type) {
 			//좌표점 계산
 			var left_str = $('#video_main_area').css('left'); var top_str = $('#video_main_area').css('top'); var left = parseInt(left_str.replace('px','')); var top = parseInt(top_str.replace('px',''));
 			var x = e.pageX - (this.offsetLeft + left); var y = e.pageY - (this.offsetTop + top);
-			//클릭 좌표점에 원과 숫자 그리기
-			var context = document.getElementById('geometry_draw_canvas').getContext("2d"); context.strokeStyle = '#f00'; context.beginPath(); context.arc(x, y, 5, 0, 2*Math.PI, true); context.stroke();
-			if(geometry_point_num>=10) context.fillText(geometry_point_num, x-7, y-6); else context.fillText(geometry_point_num, x-3, y-6);
-			geometry_point_num++;
-			if(geometry_point_before_x == 0 && geometry_point_before_y == 0) { geometry_point_before_x = x; geometry_point_before_y = y; }
-			else { context.moveTo(geometry_point_before_x, geometry_point_before_y); context.lineTo(x, y); geometry_point_before_x = x; geometry_point_before_y = y; context.stroke(); }
-			context.closePath();
-			geometry_point_arr_1.push(x);
-			geometry_point_arr_2.push(y);
+			
+			var xyBool = false;
+			for(var i = 0; i<geometry_point_arr_1.length; i++){
+				if(x >= (geometry_point_arr_1[i]-5) && x <= (geometry_point_arr_1[i]+5) 
+						&& y >= (geometry_point_arr_2[i]-5) && y <= (geometry_point_arr_2[i]+5)){
+					xyBool = true;
+				}
+			}
+			
+			if(xyBool){
+				createGeometry(type);
+			}else{
+				//클릭 좌표점에 원과 숫자 그리기
+				var context = document.getElementById('geometry_draw_canvas').getContext("2d"); context.strokeStyle = '#f00'; context.beginPath(); context.arc(x, y, 5, 0, 2*Math.PI, true); context.stroke();
+				if(geometry_point_num>=10) context.fillText(geometry_point_num, x-7, y-6); else context.fillText(geometry_point_num, x-3, y-6);
+				geometry_point_num++;
+				if(geometry_point_before_x == 0 && geometry_point_before_y == 0) { geometry_point_before_x = x; geometry_point_before_y = y; }
+				else { context.moveTo(geometry_point_before_x, geometry_point_before_y); context.lineTo(x, y); geometry_point_before_x = x; geometry_point_before_y = y; context.stroke(); }
+				context.closePath();
+				geometry_point_arr_1.push(x);
+				geometry_point_arr_2.push(y);
+			}
 		});
 	}
 	canvas_element.appendTo('#video_main_area');
 	
 	//그리기 완료 및 그리기 취소 버튼
-	var html_text = '<button class="geometry_complete_button" onclick="createGeometry('+type+');" style="left:0px; top:0px;">Draw complete</button>';
-	html_text += '<button class="geometry_cancel_button" onclick="cancelGeometry();" style="left:10px; top:0px;">Undo drawing</button>';
-	$('#video_main_area').append(html_text);
-	$('.geometry_complete_button').button(); $('.geometry_cancel_button').button();
-	$('.geometry_complete_button').width(130); $('.geometry_cancel_button').width(130);
-	$('.geometry_complete_button').height(30); $('.geometry_cancel_button').height(30);
-	$('.geometry_complete_button').css('fontSize', 12); $('.geometry_cancel_button').css('fontSize', 12);
+// 	var html_text = '<button class="geometry_complete_button" onclick="createGeometry('+type+');" style="left:0px; top:0px;">Draw complete</button>';
+// 	html_text += '<button class="geometry_cancel_button" onclick="cancelGeometry();" style="left:10px; top:0px;">Undo drawing</button>';
+// 	$('#video_main_area').append(html_text);
+// 	$('.geometry_complete_button').button(); $('.geometry_cancel_button').button();
+// 	$('.geometry_complete_button').width(130); $('.geometry_cancel_button').width(130);
+// 	$('.geometry_complete_button').height(30); $('.geometry_cancel_button').height(30);
+// 	$('.geometry_complete_button').css('fontSize', 12); $('.geometry_cancel_button').css('fontSize', 12);
 }
 
 function createGeometry(type) {
@@ -1340,10 +1359,14 @@ function saveVideoWrite(type, tmpServerId, tmpServerPass, tmpServerPort) {
 						if(urlData != null && urlData != '' && linkType != null && linkType == 'CP4'){
 							coplyUrlSave = 'Y';
 						}
+						var tmpImgDroneType = 'N';
+						if($('#droneTypeChk').attr('checked')){
+							tmpImgDroneType = 'Y';
+						}
 						
 						var Url			= baseRoot() + "cms/updateVideo/";
 						var param		= loginToken + "/" + loginId + "/" + idx + "/" + tmpTitle + "/" + tmpContent + "/" + tmpShareType + "/" + 
-							tmpAddShareUser + "/" + tmpRemoveShareUser + "/" + tmp_xml_text +"/" + tmpEditYes + "/" + tmpEditNo +"/"+ coplyUrlSave;
+							tmpAddShareUser + "/" + tmpRemoveShareUser + "/" + tmp_xml_text +"/" + tmpEditYes + "/" + tmpEditNo +"/"+ coplyUrlSave +"/" + tmpImgDroneType;
 						var callBack	= "?callback=?";
 						$.ajax({
 							type	: "POST"
@@ -2195,15 +2218,15 @@ function vidplay() {
 				<tr>
 					<td><label style="font-size:12px;">Shape Style : </label>
 					<input type='radio' name='geo_shape' value='circle'><label style="font-size:12px;">Circle</label>
-					<input type='radio' name='geo_shape' value='rect'><label style="font-size:12px;">Rect</label>
-					<input type='radio' name='geo_shape' value='point' checked><label style="font-size:12px;">Point</label></td>
+					<input type='radio' name='geo_shape' value='rect' checked><label style="font-size:12px;">Rect</label>
+					<input type='radio' name='geo_shape' value='point'><label style="font-size:12px;">Point</label></td>
 					<td width='20'></td>
 					<td rowspan='3'><button class="ui-state-default ui-corner-all" style="width:80px; height:30px; font-size:12px;" onclick="setGeometry();">Confirm</button></td>
 				</tr>
 				<tr><td><hr/></td><td width='20'></td></tr>
 				<tr>
 					<td><label style="font-size:12px;">Line Color : </label>
-					<input id="geometry_line_color" type="text" class="iColorPicker" value="#959595" style="width:50px;"/>
+					<input id="geometry_line_color" type="text" class="iColorPicker" value="#FF0000" style="width:50px;"/>
 					&nbsp;&nbsp;&nbsp;
 					<label style="font-size:12px;">MouseOver Color : </label>
 					<input id="geometry_bg_color" type="text" class="iColorPicker" value="#FF0000" style="width:50px;"/></td>
@@ -2227,6 +2250,8 @@ function vidplay() {
 						<div><input type="radio" value="1" name="shareRadio">public</div>
 						<div><input type="radio" value="2" name="shareRadio" onclick="videoGetShareUser();">sharing with friends</div>
 <!-- 						<select id="showKind"></select> -->
+
+						<div style="float: right;">Drone Type <input type="checkbox" id="droneTypeChk"></div>
 					</td>
 				</tr>
 				<tr class='tr_line'><td colspan='2'><hr/></td></tr>
