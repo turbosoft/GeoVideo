@@ -59,7 +59,7 @@ function setCenter(lat, lng) {
 			position: marker_latlng,
 			map: map,
 			title: "Center",
-			icon: marker_image,
+			icon: marker_image2,
 			draggable: false
 		});
 	}
