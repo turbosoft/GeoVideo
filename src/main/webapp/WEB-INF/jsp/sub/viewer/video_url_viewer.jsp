@@ -66,6 +66,10 @@ var dMapZoom = 10;		//default map zoom
 $(function() {
 	callRequest();
 	
+	if(linkType != 'CP1'){
+		$("#video_object_area .accordionButton:eq(1)").trigger('click');
+	}
+	
 	if(linkType != 'CP3'){
 		$('#image_view_group').parent().remove();
 		if(linkType == 'CP1'){
@@ -148,7 +152,7 @@ function httpRequest(textUrl){
 			}else{
 				base_url = '<c:url value="/"/>';
 				upload_url = '/upload/';
-				$('body').append('<button class="video_write_button" style="position:absolute; left:10px; top:530px; width:300px; height:35px; display:block; cursor: pointer;" onclick="videoWrite();">Edit Annotaion</button>');
+// 				$('body').append('<button class="video_write_button" style="position:absolute; left:10px; top:530px; width:300px; height:35px; display:block; cursor: pointer;" onclick="videoWrite();">Edit Annotaion</button>');
 				$('.viewerCloseBtn').css('display','block');
 // 				$('#iframeSrc').text("<iframe width='760' height='500' src='"+ videoOutUrl() +"/GeoVideo/geoVideo/video_viewer.do?file_url="+ file_url+ "' frameborder='0' allowfullscreen></iframe>");
 			}
@@ -318,6 +322,16 @@ function changeVideo() {
 								file_url =  response[k].filename;
 // 								$('#iframeSrc').text("<iframe width='760' height='500' src='"+ videoOutUrl() +"/GeoVideo/geoVideo/video_viewer.do?file_url="+ file_url+ "&idx="+idx+"&link=Y' frameborder='0' allowfullscreen></iframe>");
 								projectIdx = response[k].projectidx;
+								
+								$('#title_text').val(response[k].title);
+								$('#content_text').val(response[k].content);
+								var nowShareTypeText = response[k].sharetype == 0? "private":response[k].sharetype== 1? "public":"sharing with friends";
+								$('#share_text').val(nowShareTypeText);
+								if(response[k].dronetype != null && response[k].dronetype =='Y'){
+									$('#drone_text').val(response.dronetype);
+								}else{
+									$('#drone_text').val('N');
+								}
 							}
 						}
 						
@@ -376,6 +390,7 @@ function changeVideo() {
 	}
 }
 
+//add bottom image list
 function addImageMoveList(){
 	var tmpCnt = 0;
 	nowViewList = new Array();
@@ -734,14 +749,7 @@ var init_map_left, init_map_top, init_map_width, init_map_height;
 
 //저작
 function videoWrite() {
-// 	jConfirm('뷰어를 닫고 저작을 수행하시겠습니까?', '정보', function(type){
-	jConfirm('Do you want to close the viewer and author?', 'Info', function(type){
-		if(type) {
-			//뷰어 닫기 수행
-			videoViewClose();
-			openVideoWrite();
-		}
-	});
+	jAlert('This service requires login.', 'Info');
 }
 
 
@@ -1486,7 +1494,7 @@ function vidplay() {
 <!---------------------------------------------------- 메인 영역 시작 ------------------------------------------------>
 
 <!-- 비디오 영역 -->
-<div id='video_main_area' style='position:absolute; left:320px; top:15px; width:780px; height:555px; display:block; border:1px solid #999999;'>
+<div id='video_main_area' style='position:absolute; left:0px; top:15px; width:780px; height:555px; display:block; border:1px solid #999999;'>
 <!-- 	<video id='video_player' width='760' height='500' controls='true' style='position:absolute; left:10px; top:10px;'> -->
 <!-- 		<source id='video_src' src='' type='video/ogg'></source> -->
 <!-- 		<source src="http://localhost:8088/GeoCMS/upload/GeoVideo/aaaaa(1)_ogg.ogg" type="video/ogg" /> -->
@@ -1520,7 +1528,7 @@ function vidplay() {
 	</video>
 	
 </div>
-<div id="buttonbar" style="position: absolute; left: 340px; top:510px;">
+<div id="buttonbar" style="position: absolute; left: 20px; top:510px;">
     <button id="restart" onclick="restart('');" style="display: block;float: left;">[]</button> 
     <button id="rew" onclick="skip(-10)" style="display: block;float: left; margin-left: 10px;">&lt;&lt;</button>
     <button id="play" onclick="vidplay()" style="display: block;float: left; margin-left: 10px;">&gt;</button>
@@ -1550,31 +1558,54 @@ function vidplay() {
 	</div>
 </div>
 
-
 <!-- 추가 객체 영역 -->
-<div id="ioa_title" style='position:absolute; left:10px; top:300px; width:300px; height:20px;'><img src="<c:url value='/images/geoImg/title_02.jpg'/>" alt="Add Object List"></div>
-<div id='video_object_area' style='position:absolute; left:10px; top:320px; width:300px; height:200px; display:block; border:1px solid #999999; overflow-y:scroll;'>
-	<table id='object_table'>
-		<tr style='font-size:12px; height:20px;' class='col_black'>
-			<td width=50 class='anno_head_tr'>ID</td>
-			<td width=80 class='anno_head_tr'>Type</td>
-			<td width=170 class='anno_head_tr'>Data</td>
-		</tr>
-	</table>
+<div id="ioa_title" style='position:absolute; left:800px; top:300px; width:300px; height:20px;'><img src="<c:url value='/images/geoImg/title_02.jpg'/>" alt="Add Object List"></div>
+<!-- <div id='video_object_area' style='position:absolute; left:800px; top:320px; width:300px; height:200px; display:block; border:1px solid #999999; overflow-y:scroll;'> -->
+<!-- 	<table id='object_table'> -->
+<!-- 		<tr style='font-size:12px; height:20px;' class='col_black'> -->
+<!-- 			<td width=50 class='anno_head_tr'>ID</td> -->
+<!-- 			<td width=80 class='anno_head_tr'>Type</td> -->
+<!-- 			<td width=170 class='anno_head_tr'>Data</td> -->
+<!-- 		</tr> -->
+<!-- 	</table> -->
+<!-- </div> -->
+
+
+<div id='video_object_area' style='position:absolute; left:800px; top:320px; width:300px; height:200px; border:1px solid #999999; display:block; font-size:13px;'>
+	<div class='accordionButton col_black' style="background-color: #444444;">&nbsp;Data Info</div>
+	<div class='accordionContent' style='height:157px; overflow-y:scroll;'>
+		<table id='normal_exif_table'>
+			<tr><td width='15'></td><td width='100'><label style='font-size:12px;'>Title</label></td><td width='150'><input id='title_text' name='text' type='text' style='font-size:12px;' readonly/></td></tr>
+			<tr><td width='15'></td><td width='100'><label style='font-size:12px;'>Content</label></td><td width='150'><textarea id='content_text' name='text' style='font-size:12px;width: 144px;height: 50px;' readonly></textarea></td></tr>
+			<tr><td width='15'></td><td width='100'><label style='font-size:12px;'>Sharing settings</label></td><td width='150'><input id='share_text' name='text' type='text' style='font-size:12px;' readonly/></td></tr>
+			<tr><td width='15'></td><td width='100'><label style='font-size:12px;'>Drone Type</label></td><td width='150'><input id='drone_text' name='text' type='text' style='font-size:12px;' readonly/></td></tr>
+		</table>
+	</div>
+	
+	<div class='accordionButton col_black' style="background-color: #444444;">&nbsp;OBJECT DATA</div>
+	<div class='accordionContent' id='video_object_area' style='height:155px; overflow-y:scroll;'>
+		<table id='object_table'>
+			<tr style='font-size:12px; height:20px;' class='col_black'>
+				<td width=50 class='anno_head_tr'>ID</td>
+				<td width=80 class='anno_head_tr'>Type</td>
+				<td width=170 class='anno_head_tr'>Data</td>
+			</tr>
+		</table>
+	</div>
 </div>
 
 <!-- 지도 영역 -->
-<div id="ima_title"><img src="<c:url value='/images/geoImg/title_04.gif'/>" style="position:absolute; left:10px; top:12px;" alt="Map"></div>
-<div id='video_map_area' style='position:absolute; left:10px; top:33px; width:300px; height:260px; display:block; background-color:#999; border:1px solid #999999;'>
+<div id="ima_title"><img src="<c:url value='/images/geoImg/title_04.gif'/>" style="position:absolute; left:800px; top:12px;" alt="Map"></div>
+<div id='video_map_area' style='position:absolute; left:800px; top:33px; width:300px; height:260px; display:block; background-color:#999; border:1px solid #999999;'>
 	<iframe id='googlemap' src='<c:url value="/geoVideo/video_googlemap.do"/>' style='width:100%; height:100%; margin:1px; border:none;'></iframe>
 <%-- 	<div id='resize_map_btn' onclick='resizeMap();' style='position:absolute; left:0px; top:0px; width:30px; height:30px; cursor:pointer; background-image:url(<c:url value='/images/geoImg/icon_map_max.jpg'/>);'> --%>
 <!-- 	</div> -->
 </div>
 
 <!-- <div style="width:1104px; height: 30px; position: absolute;top:0;left:0;"> -->
-	<div id="copyUrlBtn" style="width: 70px;height: 20px;background-color: #25323c;border-radius:5px;text-align: center;position: absolute;top: 545px;left: 1025px;cursor: pointer;color: #ffffff;">copy URI</div>
+	<div id="copyUrlBtn" style="width: 70px;height: 20px;background-color: #25323c;border-radius:5px;text-align: center;position: absolute;top: 545px;left: 700px;cursor: pointer;color: #ffffff;">copy URI</div>
 <!-- </div> -->
-<div id="copyUrlView" class="contextMenu" style="display: none; position: absolute; width: 205px; height: 80px; background-color: rgb(228, 228, 228); left: 890px; top: 565px; border-radius: 5px; cursor: pointer;">
+<div id="copyUrlView" class="contextMenu" style="display: none; position: absolute; width: 205px; height: 80px; background-color: rgb(228, 228, 228); left: 565px; top: 565px; border-radius: 5px; cursor: pointer;">
 	<ul style="margin-left: -10px;">
 		<li id="copyTypePhoto" onclick="copyFn('CP1');" class="copyUrlViewLi">Video URI</li>
 		<li id="copyTypeMap" onclick="copyFn('CP2');" class="copyUrlViewLi">Video + Map URI</li>
@@ -1584,6 +1615,7 @@ function vidplay() {
 <input type="hidden" id="copyUrlText">
 <input type="text" id="copyUrlAll" style="position: absolute;left:30px; top: 30px; opacity:0;">
 
+<button class="video_write_button" style="position:absolute; left:800px; top:530px; width:300px; height:35px; display:block; cursor: pointer;" onclick="videoWrite();">Edit Annotaion</button>
 <!----------------------------------------------------- 메인 영역 끝 ----------------------------------------------- -->
 
 <!-- 저작 버튼 -->
