@@ -1958,7 +1958,7 @@ function vidplay() {
 </div> 
 
 <button  onclick='iframeSrcView();' style='position:absolute; left:20px; top:545px;'>Source Code</button>
-<textarea id="iframeSrc" style='position:absolute; left:340px; top:565px; width:660px; height:35px; overflow-x:hidden; line-height: 17px; font-size:12px; display:none;' readonly="readonly">
+<textarea id="iframeSrc" style='position:absolute; left:20px; top:565px; width:660px; height:35px; overflow-x:hidden; line-height: 17px; font-size:12px; display:none;' readonly="readonly">
 </textarea>
 
 <div id="video_obj_area" style="display:none;"></div>
