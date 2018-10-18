@@ -69,7 +69,7 @@ $(function() {
 	if(linkType != 'CP1'){
 		$("#video_object_area .accordionButton:eq(1)").trigger('click');
 	}else{
-		$('#makeImageBtn').remove();
+		$('.video_write_button').remove();
 	}
 	
 	if(linkType != 'CP3'){
