@@ -24,7 +24,212 @@ String linkView = request.getParameter("link");	//project User id
 String linkType = request.getParameter("linkType");	//project User id
 String urlData = request.getParameter("urlData");	//url data
 %>
+<style type="text/css">
 
+.menuIcon:hover{
+background-color: rgb(45, 120, 197);
+}
+
+.selectExifTabTitle{
+	color:blue;
+	border-top: 1px solid #d1d1d1;
+	border-bottom: none;
+/* 	border-left: 1px solid #d1d1d1; */
+	border-right: 1px solid #d1d1d1;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.noSlectExifTabTitle{
+	color:#555555;
+	background-color : #fafafa;
+	border-top: none;
+	border-bottom: 1px solid #ebebeb;
+	border-left: none;
+	border-right: 1px solid #ebebeb;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.selectExifTabChild{
+	display:block;
+	font-weight: bold;
+	font-size:13px;
+}
+
+.noSelectExifTabChild{
+	display:none;
+}
+
+/* 버튼 스타일 */
+.smallWhiteBtn {
+	border: 1px solid;
+	border-color : #b3b3b3;
+	border-radius : 3px;
+	font-size: 12px;
+	padding: 3px 15px; 
+	background-color : white;
+	color: #656565;
+	cursor: pointer;
+	text-align: center;
+	height: 30px;
+}
+
+.smallBlueBtn {
+	border: 1px solid;
+	border-color : #297acc;
+	border-radius : 3px;
+	font-size: 12px;
+	padding: 3px 15px; 
+	background-color : #297acc;
+	color: white;
+	cursor: pointer;
+	text-align: center;
+	height: 30px;
+}
+
+.smallGreyBtn {
+	border: 1px solid;
+	border-color : #6e778a;
+	border-radius : 3px;
+	font-size: 12px;
+	padding: 3px 15px; 
+	background-color : #6e778a;
+	color: white;
+	cursor: pointer;
+	text-align: center;
+	height: 30px;
+}
+
+.smallWhiteActiveBtn {
+	border: 1px solid;
+	border-color : #b3b3b3;
+	border-radius : 3px;
+	font-size: 12px;
+	padding: 3px 15px; 
+	background-color : white;
+	color: #297acc;
+	cursor: pointer;
+	text-align: center;
+	height: 30px;
+}
+/* 버튼 스타일 끝 */
+
+/* 뷰어 스타일 */
+
+.activeControlArea {
+	background-color: #1e2b41;
+	height : 200px;
+}
+
+.imgMoveBtn {
+	width: 35px;
+	height: 110px;
+	background-color: #394458;
+	float: left;
+	color : #9ca2ac;
+	font-size: 20pt;
+	font-weight: bolder;
+	margin-top: 10px;
+	cursor: pointer;
+}
+
+.imgMoveBtnImg {
+	margin-top: 40px;
+}
+
+.imageSlideBar {
+	width: 90%;
+	height: 100%;
+	float: left;
+}
+
+.imgMoveArea {
+	width:90%; 
+	height:75%; 
+	display:block; 
+	overflow-y:hidden;
+	margin-left : 75px;
+}
+
+.rightArea {
+	float: left; 
+	width: 27.5%; 
+	height: 100%;
+	background-color: white;
+	color: #333333;
+}
+
+.infoTabs {
+	height: 30px;
+/* 	width: 120px; */
+	width: 33%;
+/* 	float: left;  */
+	font-size: 13px; 
+	text-align: center;
+}
+
+.moveAreaBar{
+	width: 1%;
+	height: 100%;
+	background-color: #f5f5f5;
+	float: left;
+	cursor: e-resize;
+	border-color: #b3b3b3;
+	border-width : 0px 1px 0px 1px;
+	border-style: solid;
+}
+
+.titleLabel {
+	float:left;
+	font-size: 10pt;
+	color : white;
+}
+
+.normalTextInput {
+	border: #d1d1d1 1px solid;
+	color : #656565;
+	font-size: 9pt;
+	width: 100%;
+}
+
+.tableLabel {
+	color : #333333;
+	font-size: 9pt;
+}
+
+.editorSideBar tr{
+/* 	border-bottom: 1px solid; */
+/* 	border-color: #131b2a; */
+}
+
+.editor_side_btn {
+	cursor : pointer;
+	margin : auto;
+	margin-top: 5px;
+}
+
+.menuIcon {
+	padding-top: 5px;
+}
+
+.menuIconText {
+	font-size: 8pt;
+	color: white;
+	text-align: center;
+	margin-top: 10px;
+}
+
+.btn_td {
+	height: 80px;
+	width: 100%;
+}
+
+.writer_btn_class {
+	height: 200px;
+	background-color: white;
+}
+</style>
 <script type="text/javascript">
 var loginId = '<%= loginId %>';				// 로그인 아이디
 var loginType = '<%= loginType %>';			// 로그인 타입
@@ -66,25 +271,17 @@ var dMapZoom = 10;		//default map zoom
 $(function() {
 	callRequest();
 	
-	if(linkType != 'CP1'){
-		$("#video_object_area .accordionButton:eq(1)").trigger('click');
-	}else{
-		$('.video_write_button').remove();
+	if(linkType == 'CP1'){
+		$('.image_exif_area_head').remove();
 	}
 	
 	if(linkType != 'CP3'){
 		$('#image_view_group').parent().remove();
 		if(linkType == 'CP1'){
-			$('#ima_title').remove();
 			$('#video_map_area').remove();
-			$('#ioa_title').remove();
-			$('#video_object_area').remove();
-			$('#video_main_area').css('left','10px');
-			$('#copyUrlBtn').css('left','715px');
-			$('#copyUrlView').css('left','580px');
-			$('#buttonbar').css('left','30px');
 		}
 	}
+	
 	$('#copyUrlBtn').hover(
 		function() {
 			$('#copyUrlView').css('display','block');
@@ -168,7 +365,6 @@ function httpRequest(textUrl){
 
 //초기 설정 데이터 불러오기
 function getVideoBase() {
-	
 	var Url			= baseRoot() + "cms/getbase";
 	var callBack	= "?callback=?";
 	
@@ -190,7 +386,7 @@ function getVideoBase() {
 					}
 				}
 			}else{
-				jAlert(data.Message, 'Info');
+// 				jAlert(data.Message, 'Info');
 			}
 		}
 	});
@@ -245,8 +441,8 @@ function getServer(tmpFileType){
 }
 
 function videoViewerInit() {
+// 	callRequest();
 	getCopyUrlDecode();
-
 // 	//XML 데이터 설정
 	loadXML();
 }
@@ -266,11 +462,7 @@ function changeVideo() {
 			$(this).remove();
 		}
 	});
-	if(linkType != null && (linkType == 'CP1'|| linkType == 'CP2' || linkType == 'CP3')){
-		idx = copyUrlIdx;
-	}
 	
-	getCopyUrl();
 	if(projectBoard == 1){
 		if(loginToken == null || loginToken == '' || loginToken == 'null'){
 			loginToken = '&nbsp';
@@ -278,11 +470,12 @@ function changeVideo() {
 		if(loginId == null || loginId == '' || loginId == 'null'){
 			loginId = '&nbsp';
 		}
-		
-		var Url			= baseRoot() + "cms/getCopyDataUrl/";
-		var param		= "VIDEO/" + linkType + "/" + file_url + "/" +idx;
+		var Url			= baseRoot() + "cms/getContentChild/";
+		var param		= loginToken + "/" + loginId + "/" +idx;
 		var callBack	= "?callback=?";
 
+		getCopyUrl();
+		
 		$.ajax({
 			type	: "get"
 			, url	: Url + param + callBack
@@ -321,25 +514,29 @@ function changeVideo() {
 // 							video.load();
 							
 							if(k == 0){
+								var copyUrlData = $('#copyUrlText').val();
 								file_url =  response[k].filename;
 // 								$('#iframeSrc').text("<iframe width='760' height='500' src='"+ videoOutUrl() +"/GeoVideo/geoVideo/video_viewer.do?file_url="+ file_url+ "&idx="+idx+"&link=Y' frameborder='0' allowfullscreen></iframe>");
+								$('#iframeSrc').text("<iframe width='760' height='500' src='"+ videoOutUrl() +"/GeoVideo/geoVideo/video_url_viewer.do?urlData="+ copyUrlData +"&linkType=CP1' frameborder='0' allowfullscreen></iframe>");
 								projectIdx = response[k].projectidx;
 								
-								$('#title_text').val(response[k].title);
-								$('#content_text').val(response[k].content);
-								var nowShareTypeText = response[k].sharetype == 0? "private":response[k].sharetype== 1? "public":"sharing with friends";
-								$('#share_text').val(nowShareTypeText);
-								if(response[k].dronetype != null && response[k].dronetype =='Y'){
-									$('#drone_text').val(response.dronetype);
-								}else{
-									$('#drone_text').val('N');
+								if(linkType != 'CP1'){
+									$('#title_text').val(response[k].title);
+									$('#content_text').val(response[k].contents);
+									var nowShareTypeText = response[k].sharetype == 0? "private":response[k].sharetype== 1? "public":"sharing with friends";
+									$('#share_text').val(nowShareTypeText);
+									if(response[k].dronetype != null && response[k].dronetype =='Y'){
+										$('#drone_text').val(response[k].dronetype);
+									}else{
+										$('#drone_text').val('N');
+									}
 								}
 							}
 						}
 						
 						
 						//좌표
-						if(linkType != "CP1"){
+						if(linkType != 'CP1'){
 							var gpsDataStr = response[0].gpsdata;
 							if(gpsDataStr != null){
 								gpsDataStr = gpsDataStr.gpsData
@@ -349,18 +546,18 @@ function changeVideo() {
 						
 						if(video_child_len > 1){
 							if(video_child_len < 4){
-								var tmpHtmlStr = "<div style='width:380px; height:230px;'>No video</div>";
-								$('#video_player4').css('background','url("http://' +location.host +'/GeoVideo/images/geoImg/novideo.png")');
+								var tmpHtmlStr = "<div style='width:385px; height:230px;'>No video</div>";
+								$('#video_player4').css('background','url("../images/geoImg/novideo.png")');
 								$('#video_player4').css('board','none');
 							}
 							if(video_child_len < 3){
-								var tmpHtmlStr = "<div style='width:380px; height:230px;'>No video</div>";
-								$('#video_player3').css('background','url("http://' +location.host +'/GeoVideo/images/geoImg/novideo.png")');
+								var tmpHtmlStr = "<div style='width:385px; height:230px;'>No video</div>";
+								$('#video_player3').css('background','url("../images/geoImg/novideo.png")');
 								$('#video_player3').css('board','none');
 							}
 							if(video_child_len < 2){
-								var tmpHtmlStr = "<div style='width:380px; height:230px;'>No video</div>";
-								$('#video_player2').css('background','url("http://' +location.host +'/GeoVideo/images/geoImg/novideo.png")');
+								var tmpHtmlStr = "<div style='width:385px; height:230px;'>No video</div>";
+								$('#video_player2').css('background','url("../images/geoImg/novideo.png")');
 								$('#video_player2').css('board','none');
 							}
 						}
@@ -376,7 +573,7 @@ function changeVideo() {
 						},500);
 						
 						//프로젝트 리스트 가져오기
-						if(linkType == "CP3"){
+						if(linkType == 'CP3'){
 							addImageMoveList();
 						}
 					}
@@ -387,8 +584,9 @@ function changeVideo() {
 		});
 	}else{
 //	 	//GPX or KML 데이터 설정
-	 	loadGPS();
-	 	
+		if(linkType != 'CP1'){
+			loadGPS();
+		}
 	}
 }
 
@@ -754,35 +952,6 @@ function videoWrite() {
 	jAlert('This service requires login.', 'Info');
 }
 
-
-// //새창 띄우기 (저작)
-function openVideoWrite() {
-	if(editUserYN == 0 && (projectUserId == loginId && projectUserId != user_id)){
-		editUserYN = 1;
-	}
-	
-	window.open('', 'video_write_page', 'width=1145, height=926');
-	var form = document.createElement('form');
-	form.setAttribute('method','post');
-	form.setAttribute('action',"<c:url value='/geoVideo/video_write_page.do'/>?loginToken="+loginToken+"&loginId="+loginId+"&projectBoard="+projectBoard+'&editUserYN='+editUserYN+'&projectUserId='+projectUserId);
-	form.setAttribute('target','video_write_page');
-	document.body.appendChild(form);
-	
-	var insert = document.createElement('input');
-	insert.setAttribute('type','hidden');
-	insert.setAttribute('name','file_url');
-	insert.setAttribute('value',file_url);
-	form.appendChild(insert);
-	
-	var insertIdx = document.createElement('input');
-	insertIdx.setAttribute('type','hidden');
-	insertIdx.setAttribute('name','idx');
-	insertIdx.setAttribute('value',idx);
-	form.appendChild(insertIdx);
-	
-	form.submit();
-}
-
 var thX;
 var thY;
 function loadXML() {
@@ -794,7 +963,6 @@ function loadXML2(tmpServerId, tmpServerPass, tmpServerPort) {
 	var xml_file_name = file_arr[0] + '.xml'; 
 	xml_file_name = upload_url + xml_file_name;
 	xml_file_name = xml_file_name.substring(1);
-	
 	$.ajax({
 		type: "POST",
 		url: base_url + '/geoXml.do',
@@ -1435,13 +1603,14 @@ function vidplay() {
  			if(data.returnStr != null && data.returnStr != ''){
  				var  tmpStr = data.returnStr;
  				tmpStr = tmpStr.split("&");
- 				$.each(tmpStr, function(idx, val){
- 					if(val.indexOf('file_url') > -1){
- 						file_url = val.split('=')[1];
- 					}else if(val.indexOf('loginId') > -1){
- 						copyUserId = val.split('=')[1];
- 					}else if(val.indexOf('idx') > -1){
- 						copyUrlIdx = val.split('=')[1];
+ 				$.each(tmpStr, function(idx2, val2){
+ 					if(val2.indexOf('file_url') > -1){
+ 						file_url = val2.split('=')[1];
+ 					}else if(val2.indexOf('loginId') > -1){
+ 						copyUserId = val2.split('=')[1];
+ 					}else if(val2.indexOf('idx') > -1){
+ 						copyUrlIdx = val2.split('=')[1];
+ 						idx = copyUrlIdx;
  					}
  				});
  			}else{
@@ -1456,6 +1625,7 @@ function vidplay() {
  function copyFn(CopyType){
  	var copyUrlData = $('#copyUrlText').val();
  	var copyUrlStr = 'http://'+location.host + '/GeoVideo/geoVideo/video_url_viewer.do?urlData='+ copyUrlData +'&linkType='+CopyType;
+ 	
  	$('#copyUrlAll').val(copyUrlStr);
  	$("#copyUrlAll").select();
  	document.execCommand('copy');
@@ -1470,7 +1640,6 @@ function vidplay() {
  	var Url			= baseRoot() + "cms/encrypt";
  	var param		= "/" + encrypText + "/encrypt";
  	var callBack	= "?callback=?";
- 	
  	$.ajax({
  		type	: "get"
  		, url	: Url + param + callBack
@@ -1487,49 +1656,81 @@ function vidplay() {
  	});
  }
  
+ function exifViewFunction(sType){
+		if(sType == 'on'){
+			$('#exifViewOn').css('display','none');
+			$('#exifViewOff').css('display','block');
+			$('#image_exif_area').css('display','block');
+			$('#image_exif_area').maxZIndex({inc:1});
+//	 		$('#image_map_area').css('top','220px');
+//	 		$('#image_map_area').css('height','51%');
+		}else{
+			$('#exifViewOn').css('display','block');
+			$('#exifViewOff').css('display','none');
+			$('#image_exif_area').css('display','none');
+//	 		$('#image_map_area').css('top','10px');
+//	 		$('#image_map_area').css('height','94%');
+//	 		$('#exifViewOn').maxZIndex({inc:1});
+		}
+	}
+
+	//right image infomation view type change
+	function fnViewTabs(tempTabId){
+		$('.selectExifTabTitle').addClass('noSlectExifTabTitle');
+		$('.selectExifTabTitle').removeClass("selectExifTabTitle");
+		$('.selectExifTabChild').addClass('noSelectExifTabChild');
+		$('.selectExifTabChild').removeClass("selectExifTabChild");
+		
+		$('#tabs_'+tempTabId).removeClass('noSlectExifTabTitle');
+		$('#tabs_'+tempTabId).addClass('selectExifTabTitle');
+		
+		$('#tabsChild_'+tempTabId).removeClass("noSelectExifTabChild");
+		$('#tabsChild_'+tempTabId).addClass("selectExifTabChild");
+		
+	}
 </script>
 
 </head>
 
-<body onload='videoViewerInit();' bgcolor='#FFF'>
+<body onload='videoViewerInit();' bgcolor='#FFF' style="margin:0px;">
 
 <!---------------------------------------------------- 메인 영역 시작 ------------------------------------------------>
 
 <!-- 비디오 영역 -->
-<div id='video_main_area' style='position:absolute; left:0px; top:15px; width:780px; height:555px; display:block; border:1px solid #999999;'>
+<div id='video_main_area' style='position:absolute; left:0px; top:0px; width:780px; height:545px; display:block; border-right:1px solid #ebebeb; overflow: hidden;'>
 <!-- 	<video id='video_player' width='760' height='500' controls='true' style='position:absolute; left:10px; top:10px;'> -->
 <!-- 		<source id='video_src' src='' type='video/ogg'></source> -->
 <!-- 		<source src="http://localhost:8088/GeoCMS/upload/GeoVideo/aaaaa(1)_ogg.ogg" type="video/ogg" /> -->
 <!-- 		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다. -->
 <!-- 	</video> -->
-	<video id='video_player0' width='760' height='460' style='position:absolute; left:10px; top:10px; border: 1px solid gray;' preload="metadata">
+	<video id='video_player0' width='760' height='460' style='position:absolute; left:0px; top:0px; border: 1px solid gray;' preload="metadata">
 		<source type='video/mp4'></source>
 <!-- 		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다. -->
 		Supported in HTML5-enabled browsers (Firefox 3.6 or later or Chrome).
 	</video>
 	
-	<video id='video_player1' class='multi_class' width='380' height='230' style='position:absolute; left:10px; top:10px; border: 1px solid gray; display: none;' preload="metadata">
+	<video id='video_player1' class='multi_class' width='387' height='230' style='position:absolute; left:0px; top:0px; display: none;' preload="metadata">
 		<source type='video/mp4'></source>
 <!-- 		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다. -->
 		Supported in HTML5-enabled browsers (Firefox 3.6 or later or Chrome).
 	</video>
-	<video id='video_player2' class='multi_class' width='380' height='230' style='position:absolute; left:390px; top:10px; border: 1px solid gray; display: none;' preload="metadata" >
+	<video id='video_player2' class='multi_class' width='387' height='230' style='position:absolute; left:393px; top:0px; display: none;' preload="metadata" >
 		<source type="video/mp4" />
 <!-- 		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다. -->
 		Supported in HTML5-enabled browsers (Firefox 3.6 or later or Chrome).
 	</video>
-	<video id='video_player3' class='multi_class' width='380' height='230' style='position:absolute; left:10px; top:240px; border: 1px solid gray; display: none;' preload="metadata" >
+	<video id='video_player3' class='multi_class' width='387' height='230' style='position:absolute; left:0px; top:230px; display: none;' preload="metadata" >
 		<source type="video/mp4" />
 <!-- 		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다. -->
 		Supported in HTML5-enabled browsers (Firefox 3.6 or later or Chrome).
 	</video>
-	<video id='video_player4' class='multi_class' width='380' height='230' style='position:absolute; left:390px; top:240px; border: 1px solid gray; display: none;' preload="metadata" >
+	<video id='video_player4' class='multi_class' width='387' height='230' style='position:absolute; left:393px; top:230px; display: none;' preload="metadata" >
 		<source type="video/mp4" />
 <!-- 		HTML5 지원 브라우저(Firefox 3.6 이상 또는 Chrome)에서 지원됩니다. -->
 		Supported in HTML5-enabled browsers (Firefox 3.6 or later or Chrome).
 	</video>
-	
 </div>
+
 <div id="buttonbar" style="position: absolute; left: 20px; top:510px;">
     <button id="restart" onclick="restart('');" style="display: block;float: left;">[]</button> 
     <button id="rew" onclick="skip(-10)" style="display: block;float: left; margin-left: 10px;">&lt;&lt;</button>
@@ -1540,74 +1741,71 @@ function vidplay() {
     <button onclick="mute();" style="margin-left: 10px;">Mute</button> 
 </div> 
 
-<!-- <button  onclick='iframeSrcView();' style='position:absolute; left:340px; top:545px;'>Source Code</button> -->
-<!-- <textarea id="iframeSrc" style='position:absolute; left:340px; top:565px; width:660px; height:35px; overflow-x:hidden; line-height: 17px; font-size:12px; display:none;' readonly="readonly"> -->
-<!-- </textarea> -->
-
 <div id="video_obj_area" style="display:none;"></div>
 
-<!-- 이미지 리스트 영역 -->
-<div style="width:1104px; height: 195px; margin: 575px 0 0 -10px; background: #25323c;">
-	<div id="image_view_group" style="color:#ffffff; font-size: 16px; position: absolute; top:567px; left:10px; width:1093px; height: 38px;"></div>
-	<div id="moveSelectDiv" style="position: absolute; left:410px; top:600px; width:200px; max-height: 76px; border:1px solid #00b8b0; overflow-y:auto; display:none; color:gray;"></div>
+<div style="width:1143px; height: 205px; margin: 550px 0 0 -10px;background:#1e2b41;">
+	<div id="image_view_group" style="color:#ffffff; font-size: 16px; position: absolute; top:547px; left:10px; width:1110px; height: 38px;"></div>
+	<div id="moveSelectDiv" style="position: absolute; left:410px; top:585px; width:200px; max-height: 76px; border:1px solid #00b8b0; overflow-y:auto; display:none; color:gray;"></div>
 	
-	<div id='img_move_area' style='position:absolute; left:10px; top:600px; width:1093px; height:160px; display:block; overflow-y:hidden;'>
-		<img src='<c:url value='/images/geoImg/viewer/next_photo_pop.png'/>' style='float:right; display: none; margin-top: 10px;cursor: pointer;' class="imgMoveBtn" onclick="moveImgList('r')"> 
+	<div id='img_move_area' style='position:absolute; left:10px; top:585px; width:1115px; height:160px; display:block; overflow-y:hidden;'>
+		<img src='<c:url value='/images/geoImg/viewer/right_arrow.png'/>' style='float:right; display: none; margin-top: 10px;cursor: pointer;' class="imgMoveBtn" onclick="moveImgList('r')"> 
 		<div id='img_move_list' style='position:absolute; height:100%; left:20px; top:10px; width: 1075px; display:block;overflow-x:auto; overflow-y:hidden;'>
 			<div id='img_move_list_long' style='position:absolute; height:100%; display:block;'></div>
 		</div>
-		<img src='<c:url value='/images/geoImg/viewer/back_photo_pop.png'/>' style='float:left; display: none; margin-top: 10px; cursor: pointer;' class="imgMoveBtn" onclick="moveImgList('l')"> 
+		<img src='<c:url value='/images/geoImg/viewer/left_arrow.png'/>' style='float:left; display: none; margin-top: 10px; cursor: pointer;' class="imgMoveBtn" onclick="moveImgList('l')"> 
 	</div>
 </div>
 
-<!-- 추가 객체 영역 -->
-<div id="ioa_title" style='position:absolute; left:800px; top:300px; width:300px; height:20px;'><img src="<c:url value='/images/geoImg/title_02.jpg'/>" alt="Add Object List"></div>
-<!-- <div id='video_object_area' style='position:absolute; left:800px; top:320px; width:300px; height:200px; display:block; border:1px solid #999999; overflow-y:scroll;'> -->
-<!-- 	<table id='object_table'> -->
-<!-- 		<tr style='font-size:12px; height:20px;' class='col_black'> -->
-<!-- 			<td width=50 class='anno_head_tr'>ID</td> -->
-<!-- 			<td width=80 class='anno_head_tr'>Type</td> -->
-<!-- 			<td width=170 class='anno_head_tr'>Data</td> -->
-<!-- 		</tr> -->
-<!-- 	</table> -->
-<!-- </div> -->
-
-
-<div id='video_object_area' style='position:absolute; left:800px; top:320px; width:300px; height:200px; border:1px solid #999999; display:block; font-size:13px;'>
-	<div class='accordionButton col_black' style="background-color: #444444;">&nbsp;Data Info</div>
-	<div class='accordionContent' style='height:157px; overflow-y:scroll;'>
-		<table id='normal_exif_table'>
-			<tr><td width='15'></td><td width='100'><label style='font-size:12px;'>Title</label></td><td width='150'><input id='title_text' name='text' type='text' style='font-size:12px;' readonly/></td></tr>
-			<tr><td width='15'></td><td width='100'><label style='font-size:12px;'>Content</label></td><td width='150'><textarea id='content_text' name='text' style='font-size:12px;width: 144px;height: 50px;' readonly></textarea></td></tr>
-			<tr><td width='15'></td><td width='100'><label style='font-size:12px;'>Sharing settings</label></td><td width='150'><input id='share_text' name='text' type='text' style='font-size:12px;' readonly/></td></tr>
-			<tr><td width='15'></td><td width='100'><label style='font-size:12px;'>Drone Type</label></td><td width='150'><input id='drone_text' name='text' type='text' style='font-size:12px;' readonly/></td></tr>
-		</table>
+<!-- EXIF 삽입 다이얼로그 객체 -->
+	<div class="image_exif_area_head" style="position:absolute; left:781px; top:0px; width:352px; display:block; font-size:13px; height: 30px; border-bottom : 1px solid #ebebeb;">
+		<label style="padding: 5px 10px;line-height: 30px;font-size: 13px;">Video Infomation</label>
+		<button id="exifViewOff" class="smallWhiteBtn" onclick="exifViewFunction('off');" style="display:none; float: right;height:20px; margin: 5px 10px;" align="center">HIDE</button>
+		<button id="exifViewOn" class="smallWhiteActiveBtn" onclick="exifViewFunction('on');" style="display:block;height:20px;float: right;margin: 5px 10px;" align="center">SHOW</button>
 	</div>
-	
-	<div class='accordionButton col_black' style="background-color: #444444;">&nbsp;OBJECT DATA</div>
-	<div class='accordionContent' id='video_object_area' style='height:155px; overflow-y:scroll;'>
-		<table id='object_table'>
-			<tr style='font-size:12px; height:20px;' class='col_black'>
-				<td width=50 class='anno_head_tr'>ID</td>
-				<td width=80 class='anno_head_tr'>Type</td>
-				<td width=170 class='anno_head_tr'>Data</td>
+	<div id='image_exif_area' style='display:none; width: 352px; background: #ffffff;position: absolute;top: 31px;border-bottom: 1px solid rgb(235, 235, 235);left: 781px;z-index:2;'>
+		<!-- EXIF 삽입 다이얼로그 객체 -->
+		<table style="width: 100%;">
+			<tr>
+				<td id="tabs_1" onclick="fnViewTabs(1);" class="infoTabs selectExifTabTitle">
+					<label style="padding: 5px;display: inline-block;">Data Info</label>
+				</td>
+				<td id="tabs_2" onclick="fnViewTabs(2);" class="infoTabs noSlectExifTabTitle">
+					<label style="padding: 5px;display: inline-block;">Object Data</label>
+				</td>
+				<td style="padding: 0px; width:34%;border-bottom: 1px solid #ebebeb;">
+					<div id="tabs_3"></div>
+				</td>
 			</tr>
 		</table>
+		<div id="tabsChild_1" style='height: 195px;' class="selectExifTabChild">
+			<table id='normal_exif_table' style="margin-top: 10px;">
+				<tr><td width='15'></td><td width='100'><label class="tableLabel">Title</label></td><td width='200'><input class="normalTextInput" id='title_text' name='text' type='text' readonly/></td></tr>
+				<tr><td width='15'></td><td width='100'><label class="tableLabel">Content</label></td><td width='200'><textarea class="normalTextInput" id='content_text' name='text' style='font-size:12px;width: 98%;height: 50px;' readonly></textarea></td></tr>
+				<tr><td width='15'></td><td width='100'><label class="tableLabel">Sharing settings</label></td><td width='200'><input class="normalTextInput" id='share_text' name='text' type='text' readonly/></td></tr>
+				<tr><td width='15'></td><td width='100'><label class="tableLabel">Drone Type</label></td><td width='200'><input class="normalTextInput" id='drone_text' name='text' type='text' readonly/></td></tr>
+				<tr><td colspan="4">
+					<button class="smallWhiteBtn" style="width:115px; height:25px; display:block;float: right;" onclick="videoWrite();" id="makeImageBtn">Edit Annotaion</button>
+				</td></tr>		
+			</table>
+		</div>
+		<div id="tabsChild_2" style='height: 235px; overflow-y:scroll;' class="noSelectExifTabChild">
+			<table id='object_table'>
+				<tr style='font-size:12px; height:20px;' class='col_black'>
+					<td width=50 class='anno_head_tr'>ID</td>
+					<td width=80 class='anno_head_tr'>Type</td>
+					<td width=170 class='anno_head_tr'>Data</td>
+				</tr>
+			</table>
+		</div>
 	</div>
-</div>
 
 <!-- 지도 영역 -->
-<div id="ima_title"><img src="<c:url value='/images/geoImg/title_04.gif'/>" style="position:absolute; left:800px; top:12px;" alt="Map"></div>
-<div id='video_map_area' style='position:absolute; left:800px; top:33px; width:300px; height:260px; display:block; background-color:#999; border:1px solid #999999;'>
+<div id='video_map_area' style='position: absolute;left: 781px;top: 31px;width: 352px;height: 514px;display: block;z-index: 1;'>
 	<iframe id='googlemap' src='<c:url value="/geoVideo/video_googlemap.do"/>' style='width:100%; height:100%; margin:1px; border:none;'></iframe>
-<%-- 	<div id='resize_map_btn' onclick='resizeMap();' style='position:absolute; left:0px; top:0px; width:30px; height:30px; cursor:pointer; background-image:url(<c:url value='/images/geoImg/icon_map_max.jpg'/>);'> --%>
-<!-- 	</div> -->
 </div>
 
-<!-- <div style="width:1104px; height: 30px; position: absolute;top:0;left:0;"> -->
-	<div id="copyUrlBtn" style="width: 70px;height: 20px;background-color: #25323c;border-radius:5px;text-align: center;position: absolute;top: 545px;left: 700px;cursor: pointer;color: #ffffff;">copy URI</div>
-<!-- </div> -->
-<div id="copyUrlView" class="contextMenu" style="display: none; position: absolute; width: 205px; height: 80px; background-color: rgb(228, 228, 228); left: 565px; top: 565px; border-radius: 5px; cursor: pointer;">
+<div id="copyUrlBtn" class="smallGreyBtn" style="width: 60px;height: 20px;float: right;border-radius:5px;text-align: center;position: absolute;top: 470px;left: 680px;cursor: pointer;font-size: 13px;">copy URI</div>
+<div id="copyUrlView" class="contextMenu" style="display: block;position: absolute;width: 205px;height: 80px;background-color: rgb(228, 228, 228);left: 576px;top: 498px;border-radius: 5px;cursor: pointer;font-size: 13px;z-index:999;">
 	<ul style="margin-left: -10px;">
 		<li id="copyTypePhoto" onclick="copyFn('CP1');" class="copyUrlViewLi">Video URI</li>
 		<li id="copyTypeMap" onclick="copyFn('CP2');" class="copyUrlViewLi">Video + Map URI</li>
@@ -1616,9 +1814,6 @@ function vidplay() {
 </div>
 <input type="hidden" id="copyUrlText">
 <input type="text" id="copyUrlAll" style="position: absolute;left:30px; top: 30px; opacity:0;">
-
-<button class="video_write_button" style="position:absolute; left:800px; top:530px; width:300px; height:35px; display:block; cursor: pointer;" onclick="videoWrite();">Edit Annotaion</button>
-<!----------------------------------------------------- 메인 영역 끝 ----------------------------------------------- -->
 
 <!-- 저작 버튼 -->
 <!-- 	<button style="position:absolute; left:580px; top:780px; width:140px; height:35px; display:none; cursor: pointer;" onclick="videoViewClose();" class="viewerCloseBtn">Close</button> -->
